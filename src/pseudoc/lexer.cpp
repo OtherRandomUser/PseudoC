@@ -45,6 +45,8 @@ bool Lexer::is_eof()
 
 Token Lexer::_read_token()
 {
+    // TODO maybe get rid of this ???
+    _eat_whitespace();
 
     if (_current_pos == _src.length())
     {
@@ -58,9 +60,6 @@ Token Lexer::_read_token()
 
         return token;
     }
-
-    // TODO maybe get rid of this ???
-    _eat_whitespace();
         
     auto c = _src.at(_current_pos);
 

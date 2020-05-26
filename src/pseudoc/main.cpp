@@ -28,12 +28,10 @@ int main(int argc, char **argv)
 
     while (!lexer.is_eof())
     {
-        auto ast = parse_expression(lexer, scope);
+        auto ast = parse_statement(lexer);
 
-        std::cout << "Tokens:" << std::endl;
+        std::cout << "Statement:" << std::endl;
         std::cout << ast->print() << std::endl << std::endl;
-
-        lexer.bump();
     }
 
     return EXIT_SUCCESS;

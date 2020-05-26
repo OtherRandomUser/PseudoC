@@ -2,8 +2,7 @@
 
 using namespace ast;
 
-VariableDeclaration::VariableDeclaration(std::shared_ptr<VariableScope> scope, std::string identifier, int type_id, std::unique_ptr<Expression> initializer):
-    AstNode(std::move(scope)),
+VariableDeclaration::VariableDeclaration(std::string identifier, int type_id, std::unique_ptr<Expression> initializer):
     _identifier(std::move(identifier)),
     _type_id(type_id),
     _initializer(std::move(initializer))
@@ -20,8 +19,7 @@ irl::IrlSegment VariableDeclaration::code_gen()
     return irl::IrlSegment();
 }
 
-DeclarationStatement::DeclarationStatement(std::shared_ptr<VariableScope> scope, std::unique_ptr<VariableDeclaration> decl):
-    Statement(std::move(scope))
+DeclarationStatement::DeclarationStatement(std::unique_ptr<VariableDeclaration> decl)
 {
     _decls.push_back(std::move(decl));
 }
@@ -50,8 +48,7 @@ void DeclarationStatement::add_variable(std::unique_ptr<VariableDeclaration> dec
     _decls.push_back(std::move(decl));
 }
 
-ExpressionStatement::ExpressionStatement(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> expr):
-    Statement(std::move(scope)),
+ExpressionStatement::ExpressionStatement(std::unique_ptr<Expression> expr):
     _expr(std::move(expr))
 {
 }
@@ -62,6 +59,29 @@ std::string ExpressionStatement::print()
 }
 
 irl::IrlSegment ExpressionStatement::code_gen()
+{
+    return irl::IrlSegment();
+}
+
+void CompoundStatement::add_statement(std::unique_ptr<Statement> statement)
+{
+    _statements.push_back(std::move(statement));
+}
+
+std::string CompoundStatement::print()
+{
+    std::string res = "{\n";
+
+    for (auto& statement: _statements)
+    {
+        res += statement->print() + ";\n";
+    }
+
+    return res + "}\n";
+    
+}
+
+irl::IrlSegment CompoundStatement::code_gen()
 {
     return irl::IrlSegment();
 }

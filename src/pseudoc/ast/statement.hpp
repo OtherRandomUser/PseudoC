@@ -10,7 +10,6 @@ namespace ast
     class Statement : public AstNode
     {
     public:
-        Statement(std::shared_ptr<VariableScope> scope): AstNode(std::move(scope)) {}
         virtual ~Statement() = default;
 
         virtual std::string print() = 0;
@@ -20,7 +19,7 @@ namespace ast
     class VariableDeclaration : public AstNode
     {
     public:
-        VariableDeclaration(std::shared_ptr<VariableScope> scope, std::string identifier, int type_id, std::unique_ptr<Expression> initializer);
+        VariableDeclaration(std::string identifier, int type_id, std::unique_ptr<Expression> initializer);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -34,7 +33,7 @@ namespace ast
     class DeclarationStatement : public Statement
     {
     public:
-        DeclarationStatement(std::shared_ptr<VariableScope> scope, std::unique_ptr<VariableDeclaration> decl);
+        DeclarationStatement(std::unique_ptr<VariableDeclaration> decl);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -48,12 +47,24 @@ namespace ast
     class ExpressionStatement : public Statement
     {
     public:
-        ExpressionStatement(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> expr);
+        ExpressionStatement(std::unique_ptr<Expression> expr);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
 
     private:
         std::unique_ptr<Expression> _expr;
+    };
+
+    class CompoundStatement : public Statement
+    {
+    public:
+        void add_statement(std::unique_ptr<Statement> statement);
+
+        std::string print() override;
+        irl::IrlSegment code_gen() override;
+
+    private:
+        std::vector<std::unique_ptr<Statement>> _statements;
     };
 }

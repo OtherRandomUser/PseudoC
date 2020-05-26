@@ -10,7 +10,6 @@ namespace ast
     class Expression : public AstNode
     {
     public:
-        Expression(std::shared_ptr<VariableScope> scope): AstNode(std::move(scope)) {}
         virtual ~Expression() = default;
 
         virtual std::string print() = 0;
@@ -20,7 +19,7 @@ namespace ast
     class I32Constant : public Expression
     {
     public:
-        I32Constant(std::shared_ptr<VariableScope> scope, int value);
+        I32Constant(int value);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -32,7 +31,7 @@ namespace ast
     class F32Constant : public Expression
     {
     public:
-        F32Constant(std::shared_ptr<VariableScope> scope, float value);
+        F32Constant(float value);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -44,7 +43,7 @@ namespace ast
     class Identifier : public Expression
     {
     public:
-        Identifier(std::shared_ptr<VariableScope> scope, std::string identifier);
+        Identifier(std::string identifier);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -56,7 +55,7 @@ namespace ast
     class BinaryOp : public Expression
     {
     public:
-        BinaryOp(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         virtual std::string print() = 0;
         virtual irl::IrlSegment code_gen() = 0;
@@ -69,7 +68,7 @@ namespace ast
     class Addition : public BinaryOp
     {
     public:
-        Addition(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        Addition(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -78,7 +77,7 @@ namespace ast
     class Subtraction : public BinaryOp
     {
     public:
-        Subtraction(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        Subtraction(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -87,7 +86,7 @@ namespace ast
     class Multiplication : public BinaryOp
     {
     public:
-        Multiplication(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        Multiplication(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -96,7 +95,7 @@ namespace ast
     class Division : public BinaryOp
     {
     public:
-        Division(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        Division(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
@@ -105,7 +104,7 @@ namespace ast
     class AssignmentExpression : public Expression
     {
     public:
-        AssignmentExpression(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        AssignmentExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         virtual std::string print() = 0;
         virtual irl::IrlSegment code_gen() = 0;
@@ -118,7 +117,7 @@ namespace ast
     class RegularAssignment : public AssignmentExpression
     {
     public:
-        RegularAssignment(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        RegularAssignment(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
         irl::IrlSegment code_gen() override;
