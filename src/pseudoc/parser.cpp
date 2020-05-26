@@ -9,28 +9,28 @@ void eat_whitespace(Lexer& lexer)
         lexer.bump();
 }
 
-std::unique_ptr<Expression> parse_primary_expression(Lexer& lexer)
+std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
 {
     eat_whitespace(lexer);
     
     if (lexer.peek_current().tk_type == TokenType::IDENTIFIER)
-        return std::make_unique<Identifier>(lexer.bump().lexema);
+        return std::make_unique<ast::Identifier>(lexer.bump().lexema);
 
     if (lexer.peek_current().tk_type == TokenType::INT_LITERAL)
         // TODO parse other literals
-        return std::make_unique<I32Literal>(std::stoi(lexer.bump().lexema));
+        return std::make_unique<ast::I32Constant>(std::stoi(lexer.bump().lexema));
 
     // TODO better error handling
     throw std::logic_error("parse error on parse_primary_expression");
 }
 
-std::unique_ptr<Expression> parse_multiplicative_expression_r(Lexer& lexer, std::unique_ptr<Expression> lhs)
+std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
 {
     if (lexer.peek_current().tk_type == '*')
     {
         lexer.bump();
         auto rhs = parse_primary_expression(lexer);
-        auto expr = std::make_unique<Multiplication>(std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Multiplication>(std::move(lhs), std::move(rhs));
 
         return parse_multiplicative_expression_r(lexer, std::move(expr));
     }
@@ -39,7 +39,7 @@ std::unique_ptr<Expression> parse_multiplicative_expression_r(Lexer& lexer, std:
     {
         lexer.bump();
         auto rhs = parse_primary_expression(lexer);
-        auto expr = std::make_unique<Division>(std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Division>(std::move(lhs), std::move(rhs));
 
         return parse_multiplicative_expression_r(lexer, std::move(expr));
     }
@@ -58,19 +58,19 @@ std::unique_ptr<Expression> parse_multiplicative_expression_r(Lexer& lexer, std:
     throw std::logic_error("parse error on parse_multiplicative_expression_r");
 }
 
-std::unique_ptr<Expression> parse_multiplicative_expression(Lexer& lexer)
+std::unique_ptr<ast::Expression> parse_multiplicative_expression(Lexer& lexer)
 {
     auto lhs = parse_primary_expression(lexer);
     return parse_multiplicative_expression_r(lexer, std::move(lhs));
 }
 
-std::unique_ptr<Expression> parse_additive_expression_r(Lexer& lexer, std::unique_ptr<Expression> lhs)
+std::unique_ptr<ast::Expression> parse_additive_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
 {
     if (lexer.peek_current().tk_type == '+')
     {
         lexer.bump();
         auto rhs = parse_multiplicative_expression(lexer);
-        auto expr = std::make_unique<Addition>(std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Addition>(std::move(lhs), std::move(rhs));
 
         return parse_additive_expression_r(lexer, std::move(expr));
     }
@@ -79,7 +79,7 @@ std::unique_ptr<Expression> parse_additive_expression_r(Lexer& lexer, std::uniqu
     {
         lexer.bump();
         auto rhs = parse_multiplicative_expression(lexer);
-        auto expr = std::make_unique<Subtraction>(std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Subtraction>(std::move(lhs), std::move(rhs));
 
         return parse_additive_expression_r(lexer, std::move(expr));
     }
@@ -93,13 +93,13 @@ std::unique_ptr<Expression> parse_additive_expression_r(Lexer& lexer, std::uniqu
     throw std::logic_error("parse error on parse_additive_expression_r");
 }
 
-std::unique_ptr<Expression> parse_additive_expression(Lexer& lexer)
+std::unique_ptr<ast::Expression> parse_additive_expression(Lexer& lexer)
 {
     auto lhs = parse_multiplicative_expression(lexer);
     return parse_additive_expression_r(lexer, std::move(lhs));
 }
 
-std::unique_ptr<Expression> parse_expression(Lexer& lexer)
+std::unique_ptr<ast::Expression> parse_expression(Lexer& lexer)
 {
     return parse_additive_expression(lexer);
 }

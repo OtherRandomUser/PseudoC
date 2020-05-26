@@ -3,4 +3,4 @@
 #include <pseudoc/ast.hpp>
 #include <pseudoc/lexer.hpp>
 
-std::unique_ptr<Expression> parse_expression(Lexer& lexer);
+std::unique_ptr<ast::Expression> parse_expression(Lexer& lexer);
