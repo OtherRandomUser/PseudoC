@@ -1,4 +1,4 @@
-add_executable(randomc
+add_executable(pseudo
     pseudoc/ast
     pseudoc/main
     pseudoc/lexer
