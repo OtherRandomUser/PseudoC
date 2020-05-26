@@ -92,15 +92,20 @@ void Lexer::_eat_whitespace()
         if (_current_pos == _src.length())
             break;
 
-        if (auto curr = _src.at(_current_pos);
-            curr != ' '
-            && curr != '\t'
-            && curr != '\n'
-            && curr != '\r')
+        auto curr = _src.at(_current_pos);
+
+        if (curr != ' ' && curr != '\t' && curr != '\n' && curr != '\r')
             break;
 
         _current_pos++;
-        _current_col++;
+
+        if (curr == '\n')
+        {
+            _current_row++;
+            _current_col = 0;
+        }
+        else
+            _current_col++;
     }
 }
 
