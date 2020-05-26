@@ -5,6 +5,9 @@ add_executable(pseudoc
     pseudoc/ast/function
     pseudoc/ast/statement
     pseudoc/irl
+    pseudoc/irl/instructions
+    pseudoc/irl/type
+    pseudoc/irl/value
     pseudoc/main
     pseudoc/lexer
     pseudoc/parser
