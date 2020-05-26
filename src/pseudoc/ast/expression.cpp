@@ -117,6 +117,13 @@ irl::IrlSegment Division::code_gen()
     return irl::IrlSegment();
 }
 
+AssignmentExpression::AssignmentExpression(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
+    Expression(std::move(scope)),
+    _lhs(std::move(lhs)),
+    _rhs(std::move(rhs))
+{
+}
+
 RegularAssignment::RegularAssignment(std::shared_ptr<VariableScope> scope, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
     AssignmentExpression(std::move(scope), std::move(lhs), std::move(rhs))
 {

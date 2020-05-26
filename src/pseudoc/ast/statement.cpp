@@ -61,7 +61,7 @@ std::string ExpressionStatement::print()
     return _expr->print();
 }
 
-irl::IrlSegment code_gen()
+irl::IrlSegment ExpressionStatement::code_gen()
 {
     return irl::IrlSegment();
 }

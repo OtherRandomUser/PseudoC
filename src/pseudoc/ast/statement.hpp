@@ -10,7 +10,7 @@ namespace ast
     class Statement : public AstNode
     {
     public:
-        Statement(std::shared_ptr<VariableScope> scope);
+        Statement(std::shared_ptr<VariableScope> scope): AstNode(std::move(scope)) {}
         virtual ~Statement() = default;
 
         virtual std::string print() = 0;

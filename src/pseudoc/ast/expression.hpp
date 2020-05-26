@@ -10,7 +10,7 @@ namespace ast
     class Expression : public AstNode
     {
     public:
-        Expression(std::shared_ptr<VariableScope> scope);
+        Expression(std::shared_ptr<VariableScope> scope): AstNode(std::move(scope)) {}
         virtual ~Expression() = default;
 
         virtual std::string print() = 0;

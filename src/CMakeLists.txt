@@ -8,11 +8,14 @@ add_executable(pseudoc
     pseudoc/main
     pseudoc/lexer
     pseudoc/parser
+    pseudoc/parser/expression
+    pseudoc/parser/statement
 )
 
 set_source_files_properties(
     pseudoc/ast
     pseudoc/irl
+    pseudoc/parser
     PROPERTIES HEADER_FILE_ONLY ON
 )
 

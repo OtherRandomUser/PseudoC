@@ -5,32 +5,6 @@
 #include <pseudoc/lexer.hpp>
 #include <pseudoc/parser.hpp>
 
-// int main()
-// {
-//     std::cout << "Digite o comando a ser processado" << std::endl;
-//     std::cout << "$ ";
-
-//     std::string var;
-//     std::getline(std::cin, var);
-//     Lexer lexer(var);
-
-//     // std::cout << "Tokens:" << std::endl;
-
-//     // while (!lexer.is_eof())
-//     // {
-//     //     auto token = lexer.bump();
-
-//     //     std::cout << "    type: " << (int) token.tk_type << ", lexema: \"" << token.lexema << '"' << std::endl;
-//     // }
-
-//     auto ast = parse_expression(lexer);
-
-//     std::cout << "Tokens:" << std::endl;
-//     std::cout << ast->print() << std::endl;
-
-//     return EXIT_SUCCESS;
-// }
-
 int main(int argc, char **argv)
 {
     // TODO use a lib
@@ -50,20 +24,17 @@ int main(int argc, char **argv)
 
     std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
     Lexer lexer(src);
-
-    std::cout << "Tokens:" << std::endl;
+    auto scope = std::make_shared<ast::VariableScope>();
 
     while (!lexer.is_eof())
     {
-        auto token = lexer.bump();
+        auto ast = parse_expression(lexer, scope);
 
-        std::cout << "    type: " << (int) token.tk_type << ", lexema: \"" << token.lexema << '"' << std::endl;
+        std::cout << "Tokens:" << std::endl;
+        std::cout << ast->print() << std::endl << std::endl;
+
+        lexer.bump();
     }
-
-    // auto ast = parse_expression(lexer);
-
-    // std::cout << "Tokens:" << std::endl;
-    // std::cout << ast->print() << std::endl;
 
     return EXIT_SUCCESS;
 }
