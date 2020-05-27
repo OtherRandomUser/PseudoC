@@ -39,7 +39,7 @@ std::unique_ptr<ast::Statement> parse_declaration_statement(Lexer& lexer)
     if (sem.tk_type != ';')
         throw std::logic_error("expected ';' but found " + sem.lexema);
 
-    auto decl = std::make_unique<ast::VariableDeclaration>(identifier, type_id, std::move(initializer));
+    auto decl = std::make_unique<ast::VariableDeclaration>(identifier, std::move(initializer));
     return std::make_unique<ast::DeclarationStatement>(std::move(decl));
 }
 

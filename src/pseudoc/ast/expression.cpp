@@ -12,9 +12,18 @@ std::string I32Constant::print()
     return std::to_string(_value);
 }
 
-irl::IrlSegment I32Constant::code_gen()
+std::unique_ptr<irl::IrlSegment> I32Constant::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    auto segment = std::make_unique<irl::IrlSegment>();
+    auto literal = std::make_unique<irl::IntLiteral>();
+
+    literal->tp.atomic = irl::LlvmAtomic::i32;
+    literal->tp.ptr_level = 0;
+    literal->value = _value;
+
+    segment->out_value = std::move(literal);
+
+    return segment;
 }
 
 F32Constant::F32Constant(float value)
@@ -27,9 +36,10 @@ std::string F32Constant::print()
     return std::to_string(_value);
 }
 
-irl::IrlSegment F32Constant::code_gen()
+std::unique_ptr<irl::IrlSegment> F32Constant::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO
+    return std::make_unique<irl::IrlSegment>();
 }
 
 Identifier::Identifier(std::string identifier)
@@ -42,9 +52,10 @@ std::string Identifier::print()
     return _identifier;
 }
 
-irl::IrlSegment Identifier::code_gen()
+std::unique_ptr<irl::IrlSegment> Identifier::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO load instruction
+    return std::make_unique<irl::IrlSegment>();
 }
 
 BinaryOp::BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -63,9 +74,10 @@ std::string Addition::print()
     return "( " + _lhs->print() + " + " + _rhs->print() + " )";
 }
 
-irl::IrlSegment Addition::code_gen()
+std::unique_ptr<irl::IrlSegment> Addition::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO add instruction
+    return std::make_unique<irl::IrlSegment>();
 }
 
 Subtraction::Subtraction(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -78,9 +90,10 @@ std::string Subtraction::print()
     return "( " + _lhs->print() + " - " + _rhs->print() + " )";
 }
 
-irl::IrlSegment Subtraction::code_gen()
+std::unique_ptr<irl::IrlSegment> Subtraction::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO sub instruction
+    return std::make_unique<irl::IrlSegment>();
 }
 
 Multiplication::Multiplication(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -93,9 +106,10 @@ std::string Multiplication::print()
     return "( " + _lhs->print() + " * " + _rhs->print() + " )";
 }
 
-irl::IrlSegment Multiplication::code_gen()
+std::unique_ptr<irl::IrlSegment> Multiplication::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO mul instruction
+    return std::make_unique<irl::IrlSegment>();
 }
 
 Division::Division(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -108,9 +122,10 @@ std::string Division::print()
     return "( " + _lhs->print() + " / " + _rhs->print() + " )";
 }
 
-irl::IrlSegment Division::code_gen()
+std::unique_ptr<irl::IrlSegment> Division::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO div instruction
+    return std::make_unique<irl::IrlSegment>();
 }
 
 AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -129,7 +144,8 @@ std::string RegularAssignment::print()
     return "( " + _lhs->print() + " = " + _rhs->print() + " )";
 }
 
-irl::IrlSegment RegularAssignment::code_gen()
+std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
 {
-    return irl::IrlSegment();
+    // TODO use store instruction
+    return std::make_unique<irl::IrlSegment>();
 }

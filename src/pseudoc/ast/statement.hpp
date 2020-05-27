@@ -12,21 +12,33 @@ namespace ast
     public:
         virtual ~Statement() = default;
 
-        virtual std::string print() = 0;
-        virtual irl::IrlSegment code_gen() = 0;
+        virtual std::string print() override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override = 0;
+
+        virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        {
+            _var_scope = std::move(var_scope);
+        }
     };
 
     class VariableDeclaration : public AstNode
     {
     public:
-        VariableDeclaration(std::string identifier, int type_id, std::unique_ptr<Expression> initializer);
+        VariableDeclaration(std::string identifier, std::unique_ptr<Expression> initializer);
 
         std::string print() override;
-        irl::IrlSegment code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        {
+            if (_initializer)
+                _initializer->set_variable_scope(var_scope);
+
+            _var_scope = std::move(var_scope);
+        }
 
     private:
         std::string _identifier;
-        int _type_id;
         std::unique_ptr<Expression> _initializer;
     };
 
@@ -36,7 +48,17 @@ namespace ast
         DeclarationStatement(std::unique_ptr<VariableDeclaration> decl);
 
         std::string print() override;
-        irl::IrlSegment code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        {
+            for (auto& decl: _decls)
+            {
+                decl->set_variable_scope(var_scope);
+            }
+
+            _var_scope = std::move(var_scope);
+        }
 
         void add_variable(std::unique_ptr<VariableDeclaration> decl);
     
@@ -50,7 +72,13 @@ namespace ast
         ExpressionStatement(std::unique_ptr<Expression> expr);
 
         std::string print() override;
-        irl::IrlSegment code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        {
+            _expr->set_variable_scope(var_scope);
+            _var_scope = std::move(var_scope);
+        }
 
     private:
         std::unique_ptr<Expression> _expr;
@@ -62,7 +90,15 @@ namespace ast
         void add_statement(std::unique_ptr<Statement> statement);
 
         std::string print() override;
-        irl::IrlSegment code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        {
+            _var_scope = std::make_shared<VariableScope>(std::move(var_scope));
+
+            for (auto& statement: _statements)
+                statement->set_variable_scope(_var_scope);
+        }
 
     private:
         std::vector<std::unique_ptr<Statement>> _statements;

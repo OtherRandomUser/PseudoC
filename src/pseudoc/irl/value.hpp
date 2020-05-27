@@ -8,6 +8,8 @@ namespace irl
 {
     struct Value
     {
+        virtual ~Value() = default;
+
         LlvmType tp;
 
         virtual std::string print() = 0;

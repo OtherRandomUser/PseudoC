@@ -24,7 +24,10 @@ int main(int argc, char **argv)
 
     std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
     Lexer lexer(src);
-    auto scope = std::make_shared<ast::VariableScope>();
+    auto scope = std::make_shared<VariableScope>();
+
+    auto temp_gen = std::make_shared<TempVariableGenerator>();
+    temp_gen->set_variable_scope(scope);
 
     while (!lexer.is_eof())
     {
@@ -32,6 +35,13 @@ int main(int argc, char **argv)
 
         std::cout << "Statement:" << std::endl;
         std::cout << ast->print() << std::endl << std::endl;
+
+        std::cout << "Code Gen" << std::endl;
+
+        ast->set_variable_scope(scope);
+        auto segment = ast->code_gen(temp_gen);
+
+        std::cout << segment->print() << std::endl << std::endl;
     }
 
     return EXIT_SUCCESS;

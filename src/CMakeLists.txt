@@ -5,7 +5,9 @@ add_executable(pseudoc
     pseudoc/ast/function
     pseudoc/ast/statement
     pseudoc/irl
+    pseudoc/irl/generator
     pseudoc/irl/instructions
+    pseudoc/irl/segment
     pseudoc/irl/type
     pseudoc/irl/value
     pseudoc/main
@@ -13,14 +15,15 @@ add_executable(pseudoc
     pseudoc/parser
     pseudoc/parser/expression
     pseudoc/parser/statement
+    pseudoc/variable-map
 )
 
-set_source_files_properties(
-    pseudoc/ast
-    pseudoc/irl
-    pseudoc/parser
-    PROPERTIES HEADER_FILE_ONLY ON
-)
+# set_source_files_properties(
+#     pseudoc/ast
+#     pseudoc/irl
+#     pseudoc/parser
+#     PROPERTIES HEADER_FILE_ONLY ON
+# )
 
 target_include_directories(pseudoc
     PRIVATE

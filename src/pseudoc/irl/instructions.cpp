@@ -2,7 +2,7 @@
 
 using namespace irl;
 
-Alloca::Alloca(std::unique_ptr<Variable> out_var, short alignment):
+Alloca::Alloca(std::shared_ptr<Variable> out_var, short alignment):
     _out_var(std::move(out_var)),
     _alignment(alignment)
 {
@@ -17,10 +17,11 @@ std::string Alloca::print()
         + " = alloca "
         + type_to_string(t)
         + ", align "
-        + std::to_string(_alignment);
+        + std::to_string(_alignment)
+        + "\n";
 }
 
-Store::Store(std::unique_ptr<Value> from, std::unique_ptr<Variable> to, short alignment):
+Store::Store(std::shared_ptr<Value> from, std::shared_ptr<Variable> to, short alignment):
     _from(std::move(from)),
     _to(std::move(to)),
     _alignment(alignment)
@@ -29,12 +30,12 @@ Store::Store(std::unique_ptr<Value> from, std::unique_ptr<Variable> to, short al
 
 std::string Store::print()
 {
-    // store float 9.000000e+00, float* %1, align 4
     std::string res = "store ";
     return res
         + type_to_string(_from->tp)
         + " " + _from->print()
         + ", " + type_to_string(_from->tp)
         + " " + _to->print()
-        + ", align " + std::to_string(_alignment);
+        + ", align " + std::to_string(_alignment)
+        + "\n";
 }

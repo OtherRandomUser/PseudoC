@@ -1,7 +1,5 @@
 #include <pseudoc/parser.hpp>
 
-#include <iostream>
-
 std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
 {
     auto curr = lexer.bump();
@@ -12,8 +10,6 @@ std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
     if (curr.tk_type == TokenType::INT_LITERAL)
         // TODO parse other literals
         return std::make_unique<ast::I32Constant>(std::stoi(curr.lexema));
-
-    std::cout << curr.lexema << std::endl;
 
     // TODO better error handling
     throw std::logic_error("parse error on parse_primary_expression");
