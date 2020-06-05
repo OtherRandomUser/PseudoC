@@ -13,7 +13,7 @@ namespace ast
         virtual ~Statement() = default;
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
         virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -27,7 +27,7 @@ namespace ast
         VariableDeclaration(std::string identifier, std::unique_ptr<Expression> initializer);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -48,7 +48,7 @@ namespace ast
         DeclarationStatement(std::unique_ptr<VariableDeclaration> decl);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -72,7 +72,7 @@ namespace ast
         ExpressionStatement(std::unique_ptr<Expression> expr);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -90,7 +90,7 @@ namespace ast
         void add_statement(std::unique_ptr<Statement> statement);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {

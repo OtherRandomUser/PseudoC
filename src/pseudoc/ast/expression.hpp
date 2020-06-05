@@ -13,7 +13,7 @@ namespace ast
         virtual ~Expression() = default;
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
         virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -27,7 +27,7 @@ namespace ast
         I32Constant(int value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
     private:
         int _value;
@@ -39,7 +39,7 @@ namespace ast
         F32Constant(float value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
     private:
         float _value;
@@ -51,7 +51,7 @@ namespace ast
         Identifier(std::string identifier);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
 
     private:
         std::string _identifier;
@@ -63,7 +63,7 @@ namespace ast
         BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -84,7 +84,7 @@ namespace ast
         Addition(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
     class Subtraction : public BinaryOp
@@ -93,7 +93,7 @@ namespace ast
         Subtraction(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
     class Multiplication : public BinaryOp
@@ -102,7 +102,7 @@ namespace ast
         Multiplication(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
     class Division : public BinaryOp
@@ -111,7 +111,7 @@ namespace ast
         Division(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
     class AssignmentExpression : public Expression
@@ -120,7 +120,7 @@ namespace ast
         AssignmentExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
@@ -141,6 +141,6 @@ namespace ast
         RegularAssignment(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 }

@@ -17,7 +17,7 @@ namespace ast
         // virtual int pinpoint_type() = 0;
 
         virtual std::string print() = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen(std::shared_ptr<TempVariableGenerator> temp_gen) = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen() = 0;
 
         virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope)
         {
@@ -26,5 +26,6 @@ namespace ast
 
     protected:
         std::shared_ptr<VariableScope> _var_scope;
+        // irl::LlvmAtomic _type;
     };
 }

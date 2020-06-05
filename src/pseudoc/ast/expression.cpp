@@ -12,7 +12,7 @@ std::string I32Constant::print()
     return std::to_string(_value);
 }
 
-std::unique_ptr<irl::IrlSegment> I32Constant::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> I32Constant::code_gen()
 {
     auto segment = std::make_unique<irl::IrlSegment>();
     auto literal = std::make_unique<irl::IntLiteral>();
@@ -36,7 +36,7 @@ std::string F32Constant::print()
     return std::to_string(_value);
 }
 
-std::unique_ptr<irl::IrlSegment> F32Constant::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> F32Constant::code_gen()
 {
     // TODO
     return std::make_unique<irl::IrlSegment>();
@@ -52,7 +52,7 @@ std::string Identifier::print()
     return _identifier;
 }
 
-std::unique_ptr<irl::IrlSegment> Identifier::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> Identifier::code_gen()
 {
     // TODO load instruction
     return std::make_unique<irl::IrlSegment>();
@@ -74,7 +74,7 @@ std::string Addition::print()
     return "( " + _lhs->print() + " + " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Addition::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> Addition::code_gen()
 {
     // TODO add instruction
     return std::make_unique<irl::IrlSegment>();
@@ -90,7 +90,7 @@ std::string Subtraction::print()
     return "( " + _lhs->print() + " - " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Subtraction::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> Subtraction::code_gen()
 {
     // TODO sub instruction
     return std::make_unique<irl::IrlSegment>();
@@ -106,7 +106,7 @@ std::string Multiplication::print()
     return "( " + _lhs->print() + " * " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Multiplication::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> Multiplication::code_gen()
 {
     // TODO mul instruction
     return std::make_unique<irl::IrlSegment>();
@@ -122,7 +122,7 @@ std::string Division::print()
     return "( " + _lhs->print() + " / " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Division::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> Division::code_gen()
 {
     // TODO div instruction
     return std::make_unique<irl::IrlSegment>();
@@ -144,7 +144,7 @@ std::string RegularAssignment::print()
     return "( " + _lhs->print() + " = " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen()
 {
     // TODO use store instruction
     return std::make_unique<irl::IrlSegment>();

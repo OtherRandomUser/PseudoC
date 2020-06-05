@@ -13,7 +13,7 @@ std::string VariableDeclaration::print()
     return "var (" + _identifier + " = " + _initializer->print() +")";
 }
 
-std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
 {
     auto segment =  std::make_unique<irl::IrlSegment>();
 
@@ -22,17 +22,14 @@ std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen(std::shared_ptr<T
     tp.atomic = irl::LlvmAtomic::i32;
     tp.ptr_level = 0;
 
-    // add variable
-    _var_scope->add_variable(_identifier, tp);
-
-    // get temporary
-    auto ref = temp_gen->get_ref_value(_identifier);
+    // add variable & get temporary
+    auto ref = _var_scope->add_variable(_identifier, tp);
 
     // alloc instruction
     segment->instructions.push_back(std::make_unique<irl::Alloca>(ref, 4));
 
     // initializer expr
-    auto inner = _initializer->code_gen(temp_gen);
+    auto inner = _initializer->code_gen();
 
     // merge initializer instructions
     for (auto& i: inner->instructions)
@@ -65,13 +62,13 @@ std::string DeclarationStatement::print()
     return res + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> DeclarationStatement::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> DeclarationStatement::code_gen()
 {
     auto segment =  std::make_unique<irl::IrlSegment>();
 
     for (auto& d: _decls)
     {
-        auto inner = d->code_gen(temp_gen);
+        auto inner = d->code_gen();
 
         for (auto& i: inner->instructions)
         {
@@ -97,9 +94,9 @@ std::string ExpressionStatement::print()
     return _expr->print();
 }
 
-std::unique_ptr<irl::IrlSegment> ExpressionStatement::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> ExpressionStatement::code_gen()
 {
-    auto segment = _expr->code_gen(temp_gen);
+    auto segment = _expr->code_gen();
     return segment;
 }
 
@@ -121,16 +118,13 @@ std::string CompoundStatement::print()
     
 }
 
-std::unique_ptr<irl::IrlSegment> CompoundStatement::code_gen(std::shared_ptr<TempVariableGenerator> temp_gen)
+std::unique_ptr<irl::IrlSegment> CompoundStatement::code_gen()
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    // TODO create a new subordinate temp gen to prevent variables leaking from scope
-    temp_gen->set_variable_scope(_var_scope);
-
     for (auto& statement: _statements)
     {
-        auto inner = statement->code_gen(temp_gen);
+        auto inner = statement->code_gen();
 
         for (auto& i: inner->instructions)
         {

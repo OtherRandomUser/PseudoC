@@ -26,9 +26,6 @@ int main(int argc, char **argv)
     Lexer lexer(src);
     auto scope = std::make_shared<VariableScope>();
 
-    auto temp_gen = std::make_shared<TempVariableGenerator>();
-    temp_gen->set_variable_scope(scope);
-
     while (!lexer.is_eof())
     {
         auto ast = parse_statement(lexer);
@@ -39,7 +36,7 @@ int main(int argc, char **argv)
         std::cout << "Code Gen" << std::endl;
 
         ast->set_variable_scope(scope);
-        auto segment = ast->code_gen(temp_gen);
+        auto segment = ast->code_gen();
 
         std::cout << segment->print() << std::endl << std::endl;
     }
