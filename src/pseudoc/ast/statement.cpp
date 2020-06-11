@@ -10,7 +10,7 @@ VariableDeclaration::VariableDeclaration(std::string identifier, std::unique_ptr
 
 std::string VariableDeclaration::print()
 {
-    return "var (" + _identifier + " = " + _initializer->print() +")";
+    return "var (" + _identifier + " = " + (_initializer ? _initializer->print() : "<null>") +")";
 }
 
 std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
@@ -28,17 +28,20 @@ std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
     // alloc instruction
     segment->instructions.push_back(std::make_unique<irl::Alloca>(ref, 4));
 
-    // initializer expr
-    auto inner = _initializer->code_gen();
-
-    // merge initializer instructions
-    for (auto& i: inner->instructions)
+    if (_initializer)
     {
-        segment->instructions.push_back(std::move(i));
-    }
+        // initializer expr
+        auto inner = _initializer->code_gen();
 
-    // store value on variable
-    segment->instructions.push_back(std::make_unique<irl::Store>(inner->out_value, ref, 4));
+        // merge initializer instructions
+        for (auto& i: inner->instructions)
+        {
+            segment->instructions.push_back(std::move(i));
+        }
+
+        // store value on variable
+        segment->instructions.push_back(std::make_unique<irl::Store>(inner->out_value, ref, 4));
+    }
 
     return segment;
 }

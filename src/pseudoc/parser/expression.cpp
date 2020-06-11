@@ -35,8 +35,9 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
         return parse_multiplicative_expression_r(lexer, std::move(expr));
     }
 
-    if (auto curr = lexer.peek_current();
-        curr.tk_type == ';'
+    auto curr = lexer.peek_current();
+
+    if (curr.tk_type == ';'
         || curr.tk_type == '+'
         || curr.tk_type == '-')
     {
