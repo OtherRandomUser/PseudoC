@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug",
             "program": "${workspaceFolder}/build/bin/pseudoc",
-            "args": ["test-files/fs.c"],
+            "args": ["test-files/t.c"],
             "cwd": "${workspaceFolder}"
         }
     ]

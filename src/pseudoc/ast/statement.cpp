@@ -18,9 +18,7 @@ std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
     auto segment =  std::make_unique<irl::IrlSegment>();
 
     // variable type
-    irl::LlvmType tp;
-    tp.atomic = irl::LlvmAtomic::i32;
-    tp.ptr_level = 0;
+    auto tp = irl::LlvmAtomic::i32;
 
     // add variable & get temporary
     auto ref = _var_scope->add_variable(_identifier, tp);

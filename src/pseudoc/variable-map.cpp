@@ -11,7 +11,7 @@ VariableScope::VariableScope(std::shared_ptr<VariableScope> parent):
 {
 }
 
-std::shared_ptr<irl::Variable> VariableScope::add_variable(std::string id, irl::LlvmType type)
+std::shared_ptr<irl::Variable> VariableScope::add_variable(std::string id, irl::LlvmAtomic tp)
 {
     // verifies redeclaration on the current scope
     // it should be possible to correctly override the parent scope
@@ -23,10 +23,7 @@ std::shared_ptr<irl::Variable> VariableScope::add_variable(std::string id, irl::
             throw std::logic_error("variable " + id + "redeclared");
     }
 
-    auto var = std::make_shared<irl::Variable>();
-    var->id = '\%' + _name_gen->get_next();
-    var->tp = type;
-
+    auto var = new_temp(tp);
     _variables[id] = var;
 
     return var;
@@ -45,4 +42,13 @@ std::shared_ptr<irl::Variable> VariableScope::get_variable(const std::string& id
     }
 
     return it->second;
+}
+
+std::shared_ptr<irl::Variable> VariableScope::new_temp(irl::LlvmAtomic tp)
+{
+    auto var = std::make_shared<irl::Variable>();
+    var->id = '\%' + _name_gen->get_next();
+    var->tp = tp;
+
+    return var;
 }

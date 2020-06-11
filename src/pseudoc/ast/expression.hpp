@@ -45,10 +45,10 @@ namespace ast
         float _value;
     };
 
-    class Identifier : public Expression
+    class VariableRef : public Expression
     {
     public:
-        Identifier(std::string identifier);
+        VariableRef(std::string identifier);
 
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;

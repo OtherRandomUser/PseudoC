@@ -1,15 +1,19 @@
 #include <pseudoc/parser.hpp>
 
+#include <iostream>
+
 std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
 {
     auto curr = lexer.bump();
     
     if (curr.tk_type == TokenType::IDENTIFIER)
-        return std::make_unique<ast::Identifier>(curr.lexema);
+        return std::make_unique<ast::VariableRef>(curr.lexema);
 
     if (curr.tk_type == TokenType::INT_LITERAL)
         // TODO parse other literals
         return std::make_unique<ast::I32Constant>(std::stoi(curr.lexema));
+
+    std::cout << curr.tk_type << std::endl;
 
     // TODO better error handling
     throw std::logic_error("parse error on parse_primary_expression");

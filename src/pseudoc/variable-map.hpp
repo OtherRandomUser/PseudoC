@@ -25,8 +25,10 @@ public:
     VariableScope();
     VariableScope(std::shared_ptr<VariableScope> parent);
 
-    std::shared_ptr<irl::Variable> add_variable(std::string id, irl::LlvmType type_id);
+    std::shared_ptr<irl::Variable> add_variable(std::string id, irl::LlvmAtomic tp);
     std::shared_ptr<irl::Variable> get_variable(const std::string& id);
+
+    std::shared_ptr<irl::Variable> new_temp(irl::LlvmAtomic tp);
 
 protected:
     std::shared_ptr<IrlNameGenerator> _name_gen;

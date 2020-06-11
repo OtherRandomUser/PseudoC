@@ -10,7 +10,7 @@ namespace irl
     {
         virtual ~Value() = default;
 
-        LlvmType tp;
+        LlvmAtomic tp;
 
         virtual std::string print() = 0;
     };

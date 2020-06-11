@@ -10,12 +10,9 @@ Alloca::Alloca(std::shared_ptr<Variable> out_var, short alignment):
 
 std::string Alloca::print()
 {
-    auto t = _out_var->tp;
-    t.ptr_level -= 1;
-
     return _out_var->print()
         + " = alloca "
-        + type_to_string(t)
+        + atomic_to_string(_out_var->tp)
         + ", align "
         + std::to_string(_alignment)
         + "\n";
@@ -32,10 +29,30 @@ std::string Store::print()
 {
     std::string res = "store ";
     return res
-        + type_to_string(_from->tp)
+        + atomic_to_string(_from->tp)
         + " " + _from->print()
-        + ", " + type_to_string(_from->tp)
-        + " " + _to->print()
+        + ", " + atomic_to_string(_from->tp)
+        + "* " + _to->print()
         + ", align " + std::to_string(_alignment)
+        + "\n";
+}
+
+Load::Load(std::shared_ptr<Value> from, std::shared_ptr<Variable> to, short alignment):
+    _from(std::move(from)),
+    _to(std::move(to)),
+    _alignment(alignment)
+{
+}
+
+std::string Load::print()
+{
+    return _to->print()
+        + " = load "
+        + atomic_to_string(_to->tp)
+        + ", "
+        + atomic_to_string(_from->tp)
+        + "* " + _from->print()
+        + ", align "
+        + std::to_string(_alignment)
         + "\n";
 }

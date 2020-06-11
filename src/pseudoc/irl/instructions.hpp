@@ -40,4 +40,17 @@ namespace irl
         std::shared_ptr<Value> _to;
         short _alignment;
     };
+
+    class Load : public Instruction
+    {
+    public:
+        Load(std::shared_ptr<Value> from, std::shared_ptr<Variable> to, short alignment);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Value> _from;
+        std::shared_ptr<Value> _to;
+        short _alignment;
+    };
 }

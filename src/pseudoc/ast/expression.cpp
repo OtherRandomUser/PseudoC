@@ -1,5 +1,7 @@
 #include <pseudoc/ast/expression.hpp>
 
+#include <iostream>
+
 using namespace ast;
 
 I32Constant::I32Constant(int value)
@@ -17,8 +19,7 @@ std::unique_ptr<irl::IrlSegment> I32Constant::code_gen()
     auto segment = std::make_unique<irl::IrlSegment>();
     auto literal = std::make_unique<irl::IntLiteral>();
 
-    literal->tp.atomic = irl::LlvmAtomic::i32;
-    literal->tp.ptr_level = 0;
+    literal->tp = irl::LlvmAtomic::i32;
     literal->value = _value;
 
     segment->out_value = std::move(literal);
@@ -42,20 +43,27 @@ std::unique_ptr<irl::IrlSegment> F32Constant::code_gen()
     return std::make_unique<irl::IrlSegment>();
 }
 
-Identifier::Identifier(std::string identifier)
+VariableRef::VariableRef(std::string identifier)
 {
     _identifier = identifier;
 }
 
-std::string Identifier::print()
+std::string VariableRef::print()
 {
     return _identifier;
 }
 
-std::unique_ptr<irl::IrlSegment> Identifier::code_gen()
+std::unique_ptr<irl::IrlSegment> VariableRef::code_gen()
 {
-    // TODO load instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto ref = _var_scope->get_variable(_identifier);
+    auto out = _var_scope->new_temp(ref->tp);
+
+    segment->instructions.push_back(std::make_unique<irl::Load>(ref, out, 4));
+    segment->out_value = std::move(out);
+
+    return segment;
 }
 
 BinaryOp::BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):

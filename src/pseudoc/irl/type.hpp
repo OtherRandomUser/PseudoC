@@ -16,11 +16,5 @@ namespace irl
         db
     };
 
-    struct LlvmType
-    {
-        LlvmAtomic atomic;
-        short ptr_level = 0;
-    };
-
-    std::string type_to_string(LlvmType t);
+    std::string atomic_to_string(LlvmAtomic a);
 }

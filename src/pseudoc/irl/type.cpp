@@ -2,50 +2,33 @@
 
 namespace irl
 {
-    std::string type_to_string(LlvmType t)
+    std::string atomic_to_string(LlvmAtomic a)
     {
-        std::string out;
-
-        switch (t.atomic)
+        switch (a)
         {
         case v:
-            out = "void";
-            break;
+            return "void";
 
         case i8:
-            out = "i8";
-            break;
+            return "i8";
 
         case i16:
-            out = "i16";
-            break;
+            return "i16";
 
         case i32:
-            out = "i32";
-            break;
+            return "i32";
 
         case i64:
-            out = "i64";
-            break;
+            return "i64";
 
         case fp:
-            out = "float";
-            break;
+            return "float";
 
         case db:
-            out = "double";
-            break;
+            return "double";
 
         default:
-            out = "";
-            break;
+            return "";
         };
-
-        for (auto i = 0; i < t.ptr_level; i++)
-        {
-            out += "*";
-        }
-
-        return out;
     }
 }
