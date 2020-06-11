@@ -93,6 +93,14 @@ void Lexer::_eat_whitespace()
 
         auto curr = _src.at(_current_pos);
 
+        if (curr == '/'
+            && _current_pos + 1 < _src.length()
+            && _src.at(_current_pos + 1) == '/')
+        {
+            _eat_comment_ln();
+            continue;
+        }
+
         if (curr != ' ' && curr != '\t' && curr != '\n' && curr != '\r')
             break;
 
@@ -102,6 +110,28 @@ void Lexer::_eat_whitespace()
         {
             _current_row++;
             _current_col = 0;
+        }
+        else
+            _current_col++;
+    }
+}
+
+void Lexer::_eat_comment_ln()
+{
+    while (true)
+    {
+        if (_current_pos == _src.length())
+            break;
+
+        auto curr = _src.at(_current_pos);
+
+        _current_pos++;
+
+        if (curr == '\n')
+        {
+            _current_row++;
+            _current_col = 0;
+            break;
         }
         else
             _current_col++;

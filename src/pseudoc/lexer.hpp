@@ -98,6 +98,7 @@ private:
     Token _read_identifier_or_keyword();
 
     void _eat_whitespace();
+    void _eat_comment_ln();
 
     Token _create_ascii_token(char c);
 };
