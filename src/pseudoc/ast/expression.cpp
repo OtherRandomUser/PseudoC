@@ -84,8 +84,27 @@ std::string Addition::print()
 
 std::unique_ptr<irl::IrlSegment> Addition::code_gen()
 {
-    // TODO add instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(tp);
+    segment->instructions.push_back(std::make_unique<irl::Add>(out, std::move(lhs->out_value), std::move(rhs->out_value), tp));
+    segment->out_value = std::move(out);
+
+    return segment;
 }
 
 Subtraction::Subtraction(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -100,8 +119,27 @@ std::string Subtraction::print()
 
 std::unique_ptr<irl::IrlSegment> Subtraction::code_gen()
 {
-    // TODO sub instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(tp);
+    segment->instructions.push_back(std::make_unique<irl::Sub>(out, std::move(lhs->out_value), std::move(rhs->out_value), tp));
+    segment->out_value = std::move(out);
+
+    return segment;
 }
 
 Multiplication::Multiplication(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -116,8 +154,27 @@ std::string Multiplication::print()
 
 std::unique_ptr<irl::IrlSegment> Multiplication::code_gen()
 {
-    // TODO mul instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(tp);
+    segment->instructions.push_back(std::make_unique<irl::Mul>(out, std::move(lhs->out_value), std::move(rhs->out_value), tp));
+    segment->out_value = std::move(out);
+
+    return segment;
 }
 
 Division::Division(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
@@ -132,28 +189,59 @@ std::string Division::print()
 
 std::unique_ptr<irl::IrlSegment> Division::code_gen()
 {
-    // TODO div instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(tp);
+    segment->instructions.push_back(std::make_unique<irl::SDiv>(out, std::move(lhs->out_value), std::move(rhs->out_value), tp));
+    segment->out_value = std::move(out);
+
+    return segment;
 }
 
-AssignmentExpression::AssignmentExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
-    _lhs(std::move(lhs)),
-    _rhs(std::move(rhs))
+AssignmentExpression::AssignmentExpression(std::string identifier, std::unique_ptr<Expression> inner):
+    _identifier(std::move(identifier)),
+    _inner(std::move(inner))
 {
 }
 
-RegularAssignment::RegularAssignment(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
-    AssignmentExpression(std::move(lhs), std::move(rhs))
+RegularAssignment::RegularAssignment(std::string identifier, std::unique_ptr<Expression> inner):
+    AssignmentExpression(std::move(identifier), std::move(inner))
 {
 }
 
 std::string RegularAssignment::print()
 {
-    return "( " + _lhs->print() + " = " + _rhs->print() + " )";
+    return "( " + _identifier + " = " + _inner->print() + " )";
 }
 
 std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen()
 {
-    // TODO use store instruction
-    return std::make_unique<irl::IrlSegment>();
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto ref = _var_scope->get_variable(_identifier);
+
+    auto inner = _inner->code_gen();
+    for (auto& i: inner->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Store>(inner->out_value, std::move(ref), 4));
+    segment->out_value = std::move(inner->out_value);
+
+    return segment;
 }

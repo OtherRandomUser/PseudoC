@@ -93,7 +93,26 @@ std::unique_ptr<ast::Expression> parse_additive_expression(Lexer& lexer)
     return parse_additive_expression_r(lexer, std::move(lhs));
 }
 
+std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
+{
+    if (lexer.peek_next().tk_type == '=')
+    {
+        auto curr = lexer.bump();
+
+        if (curr.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("parse error on parse_assignment_expression (lhs)");
+
+        lexer.bump();
+
+        auto rhs = parse_additive_expression(lexer);
+
+        return std::make_unique<ast::RegularAssignment>(std::move(curr.lexema), std::move(rhs));
+    }
+
+    return parse_additive_expression(lexer);
+}
+
 std::unique_ptr<ast::Expression> parse_expression(Lexer& lexer)
 {
-    return parse_additive_expression(lexer);
+    return parse_assignment_expression(lexer);
 }

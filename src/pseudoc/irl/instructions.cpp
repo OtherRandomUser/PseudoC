@@ -18,7 +18,7 @@ std::string Alloca::print()
         + "\n";
 }
 
-Store::Store(std::shared_ptr<Value> from, std::shared_ptr<Variable> to, short alignment):
+Store::Store(std::shared_ptr<Value> from, std::shared_ptr<Value> to, short alignment):
     _from(std::move(from)),
     _to(std::move(to)),
     _alignment(alignment)
@@ -37,7 +37,7 @@ std::string Store::print()
         + "\n";
 }
 
-Load::Load(std::shared_ptr<Value> from, std::shared_ptr<Variable> to, short alignment):
+Load::Load(std::shared_ptr<Variable> from, std::shared_ptr<Variable> to, short alignment):
     _from(std::move(from)),
     _to(std::move(to)),
     _alignment(alignment)
@@ -54,5 +54,89 @@ std::string Load::print()
         + "* " + _from->print()
         + ", align "
         + std::to_string(_alignment)
+        + "\n";
+}
+
+Add::Add(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp):
+    _out(std::move(out)),
+    _lhs(std::move(lhs)),
+    _rhs(std::move(rhs))
+{
+    _tp = tp;
+
+    if (_out->tp != tp || _lhs->tp != tp || _rhs->tp != tp)
+        throw std::logic_error("Type mismatch");
+}
+
+std::string Add::print()
+{
+    return _out->print()
+        + " = add nsw "
+        + atomic_to_string(_tp)
+        + " " + _lhs->print()
+        + ", " + _rhs->print()
+        + "\n";
+}
+
+Sub::Sub(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp):
+    _out(std::move(out)),
+    _lhs(std::move(lhs)),
+    _rhs(std::move(rhs))
+{
+    _tp = tp;
+
+    if (_out->tp != tp || _lhs->tp != tp || _rhs->tp != tp)
+        throw std::logic_error("Type mismatch");
+}
+
+std::string Sub::print()
+{
+    return _out->print()
+        + " = sub nsw "
+        + atomic_to_string(_tp)
+        + " " + _lhs->print()
+        + ", " + _rhs->print()
+        + "\n";
+}
+
+Mul::Mul(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp):
+    _out(std::move(out)),
+    _lhs(std::move(lhs)),
+    _rhs(std::move(rhs))
+{
+    _tp = tp;
+
+    if (_out->tp != tp || _lhs->tp != tp || _rhs->tp != tp)
+        throw std::logic_error("Type mismatch");
+}
+
+std::string Mul::print()
+{
+    return _out->print()
+        + " = mul nsw "
+        + atomic_to_string(_tp)
+        + " " + _lhs->print()
+        + ", " + _rhs->print()
+        + "\n";
+}
+
+SDiv::SDiv(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp):
+    _out(std::move(out)),
+    _lhs(std::move(lhs)),
+    _rhs(std::move(rhs))
+{
+    _tp = tp;
+
+    if (_out->tp != tp || _lhs->tp != tp || _rhs->tp != tp)
+        throw std::logic_error("Type mismatch");
+}
+
+std::string SDiv::print()
+{
+    return _out->print()
+        + " = sdiv nsw "
+        + atomic_to_string(_tp)
+        + " " + _lhs->print()
+        + ", " + _rhs->print()
         + "\n";
 }

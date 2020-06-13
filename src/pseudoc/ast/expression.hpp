@@ -117,28 +117,27 @@ namespace ast
     class AssignmentExpression : public Expression
     {
     public:
-        AssignmentExpression(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        AssignmentExpression(std::string identifier, std::unique_ptr<Expression> inner);
 
         virtual std::string print() override = 0;
         virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
         {
-            _lhs->set_variable_scope(var_scope);
-            _rhs->set_variable_scope(var_scope);
+            _inner->set_variable_scope(var_scope);
 
             _var_scope = std::move(var_scope);
         }
 
     protected:
-        std::unique_ptr<Expression> _lhs;
-        std::unique_ptr<Expression> _rhs;
+        std::string _identifier;
+        std::unique_ptr<Expression> _inner;
     };
 
     class RegularAssignment : public AssignmentExpression
     {
     public:
-        RegularAssignment(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+        RegularAssignment(std::string identifier, std::unique_ptr<Expression> inner);
 
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
