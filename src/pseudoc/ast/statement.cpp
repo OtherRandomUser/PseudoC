@@ -101,6 +101,31 @@ std::unique_ptr<irl::IrlSegment> ExpressionStatement::code_gen()
     return segment;
 }
 
+ReturnStatement::ReturnStatement(std::unique_ptr<Expression> expr):
+    _expr(std::move(expr))
+{
+}
+
+std::string ReturnStatement::print()
+{
+    return "ret " + _expr->print();
+}
+
+std::unique_ptr<irl::IrlSegment> ReturnStatement::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+    auto expr = _expr->code_gen();
+
+    for (auto& i: expr->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Ret>(std::move(expr->out_value), _expr->get_type()));
+
+    return segment;
+}
+
 void CompoundStatement::add_statement(std::unique_ptr<Statement> statement)
 {
     _statements.push_back(std::move(statement));

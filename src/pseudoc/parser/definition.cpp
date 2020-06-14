@@ -4,19 +4,19 @@ irl::LlvmAtomic parse_type(Lexer& lexer)
 {
     auto curr = lexer.peek_current();
 
-    if (curr.lexema == "int")
+    if (curr.tk_type == TokenType::INT)
     {
         lexer.bump();
         return irl::LlvmAtomic::i32;
     }
 
-    if (curr.lexema == "float")
+    if (curr.tk_type == TokenType::FLOAT)
     {
         lexer.bump();
         return irl::LlvmAtomic::fp;
     }
 
-    if (curr.lexema == "void")
+    if (curr.tk_type == TokenType::VOID)
     {
         lexer.bump();
         return irl::LlvmAtomic::v;

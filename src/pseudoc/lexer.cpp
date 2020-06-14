@@ -198,7 +198,7 @@ Token Lexer::_read_numeral()
         _current_col++;
     }
 
-    if (_current_pos < _src.length() && _src.at(_current_pos) < '.')
+    if (_current_pos < _src.length() && _src.at(_current_pos) == '.')
     {
         _current_pos++;
         _current_col++;
@@ -231,6 +231,72 @@ Token Lexer::_read_numeral()
     };
 }
 
+TokenType get_keyword(const std::string& lexema)
+{
+
+    if (lexema == "void")
+        return TokenType::VOID;
+
+    if (lexema == "char")
+        return TokenType::CHAR;
+
+    if (lexema == "int")
+        return TokenType::INT;
+
+    if (lexema == "float")
+        return TokenType::FLOAT;
+
+    if (lexema == "double")
+        return TokenType::DOUBLE;
+
+    if (lexema == "long")
+        return TokenType::LONG;
+
+    if (lexema == "short")
+        return TokenType::SHORT;
+
+    if (lexema == "enum")
+        return TokenType::ENUM;
+
+    if (lexema == "struct")
+        return TokenType::STRUCT;
+
+    if (lexema == "if")
+        return TokenType::IF;
+
+    if (lexema == "else")
+        return TokenType::ELSE;
+
+    if (lexema == "while")
+        return TokenType::WHILE;
+
+    if (lexema == "do")
+        return TokenType::DO;
+
+    if (lexema == "for")
+        return TokenType::FOR;
+
+    if (lexema == "goto")
+        return TokenType::GOTO;
+
+    if (lexema == "return")
+        return TokenType::RETURN;
+
+    if (lexema == "switch")
+        return TokenType::SWITCH;
+
+    if (lexema == "case")
+        return TokenType::CASE;
+
+    if (lexema == "breack")
+        return TokenType::BREAK;
+
+    if (lexema == "continue")
+        return TokenType::CONTINUE;
+
+    return TokenType::IDENTIFIER;
+}
+
 Token Lexer::_read_identifier_or_keyword()
 {
     auto start_pos = _current_pos;
@@ -252,72 +318,12 @@ Token Lexer::_read_identifier_or_keyword()
     }
 
     auto lexema = _src.substr(start_pos, _current_col - start_col);
-    auto tp = TokenType::IDENTIFIER;
-
-    if (lexema == "void")
-        tp = TokenType::VOID;
-
-    if (lexema == "char")
-        tp = TokenType::CHAR;
-
-    if (lexema == "int")
-        tp = TokenType::INT;
-
-    if (lexema == "float")
-        tp = TokenType::FLOAT;
-
-    if (lexema == "double")
-        tp = TokenType::DOUBLE;
-
-    if (lexema == "long")
-        tp = TokenType::LONG;
-
-    if (lexema == "short")
-        tp = TokenType::SHORT;
-
-    if (lexema == "enum")
-        tp = TokenType::ENUM;
-
-    if (lexema == "struct")
-        tp = TokenType::STRUCT;
-
-    if (lexema == "if")
-        tp = TokenType::IF;
-
-    if (lexema == "else")
-        tp = TokenType::ELSE;
-
-    if (lexema == "while")
-        tp = TokenType::WHILE;
-
-    if (lexema == "do")
-        tp = TokenType::DO;
-
-    if (lexema == "for")
-        tp = TokenType::FOR;
-
-    if (lexema == "goto")
-        tp = TokenType::GOTO;
-
-    if (lexema == "return")
-        tp = TokenType::RETURN;
-
-    if (lexema == "switch")
-        tp = TokenType::SWITCH;
-
-    if (lexema == "case")
-        tp = TokenType::CASE;
-
-    if (lexema == "breack")
-        tp = TokenType::BREAK;
-
-    if (lexema == "continue")
-        tp = TokenType::CONTINUE;
+    auto tp = get_keyword(lexema);
 
 
     return {
-        .tk_type = TokenType::IDENTIFIER,
-        .lexema = _src.substr(start_pos, _current_col - start_col),
+        .tk_type = tp,
+        .lexema = lexema,
         .row = _current_row,
         .col = start_col
     };

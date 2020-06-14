@@ -2,22 +2,13 @@
 
 bool is_type(const Token& tk)
 {
-    if (tk.tk_type != TokenType::IDENTIFIER)
-        return false;
-
-    return tk.lexema == "int";
+    return tk.tk_type == TokenType::INT || tk.tk_type == TokenType::FLOAT || tk.tk_type == TokenType::VOID;
 }
 
 std::unique_ptr<ast::Statement> parse_declaration_statement(Lexer& lexer)
 {
-    // TODO flexibilize
-    int type_id = 0;
+    auto tp = parse_type(lexer);
     auto curr = lexer.bump();
-
-    if (curr.lexema != "int")
-        throw std::logic_error("Expected type but found " + curr.lexema);
-
-    curr = lexer.bump();
 
     if (curr.tk_type != TokenType::IDENTIFIER)
         throw std::logic_error("Expected identifier but found " + curr.lexema);
@@ -79,6 +70,18 @@ std::unique_ptr<ast::Statement> parse_expression_statement(Lexer& lexer)
     return std::make_unique<ast::ExpressionStatement>(std::move(expr));
 }
 
+std::unique_ptr<ast::Statement> parse_return_statement(Lexer& lexer)
+{
+    lexer.bump();
+    auto expr = parse_expression(lexer);
+    auto curr = lexer.bump();
+
+    if (curr.tk_type != ';')
+        throw std::logic_error("expected ';' but found " + curr.lexema);
+
+    return std::make_unique<ast::ReturnStatement>(std::move(expr));
+}
+
 std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 {
     if (is_type(lexer.peek_current()))
@@ -86,6 +89,9 @@ std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 
     if (lexer.peek_current().tk_type == '{')
         return parse_compound_statement(lexer);
+
+    if (lexer.peek_current().tk_type == TokenType::RETURN)
+        return parse_return_statement(lexer);
         
     return parse_expression_statement(lexer);
 }

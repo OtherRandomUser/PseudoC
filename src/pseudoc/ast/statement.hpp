@@ -88,6 +88,25 @@ namespace ast
         std::unique_ptr<Expression> _expr;
     };
 
+    class ReturnStatement : public Statement
+    {
+    public:
+        ReturnStatement(std::unique_ptr<Expression> expr);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            _expr->set_variable_scope(var_scope, _ftable);
+            _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
+        }
+
+    private:
+        std::unique_ptr<Expression> _expr;
+    };
+
     class CompoundStatement : public Statement
     {
     public:

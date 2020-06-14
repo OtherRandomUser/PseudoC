@@ -176,5 +176,5 @@ Ret::Ret(std::shared_ptr<Value> res, LlvmAtomic tp):
 
 std::string Ret::print()
 {
-    return "  ret " + atomic_to_string(_tp) + " " + _res->print();
+    return "  ret " + atomic_to_string(_tp) + " " + _res->print() + "\n";
 }

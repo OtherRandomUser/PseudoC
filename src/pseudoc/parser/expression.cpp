@@ -13,7 +13,7 @@ std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
         // TODO parse other literals
         return std::make_unique<ast::I32Constant>(std::stoi(curr.lexema));
 
-    std::cout << curr.tk_type << std::endl;
+    std::cout << curr.tk_type << " " << curr.lexema << std::endl;
 
     // TODO better error handling
     throw std::logic_error("parse error on parse_primary_expression");
@@ -49,7 +49,7 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
     }
 
     // TODO better error handling
-    throw std::logic_error("parse error on parse_multiplicative_expression_r");
+    throw std::logic_error("parse error on parse_multiplicative_expression_r " + curr.lexema);
 }
 
 std::unique_ptr<ast::Expression> parse_multiplicative_expression(Lexer& lexer)
