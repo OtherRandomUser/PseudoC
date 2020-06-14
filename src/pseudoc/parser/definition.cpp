@@ -70,7 +70,7 @@ std::unique_ptr<std::vector<std::unique_ptr<ast::FunctionParam>>> parse_param_de
         return std::make_unique<std::vector<std::unique_ptr<ast::FunctionParam>>>();
     }
 
-    auto list = std::unique_ptr<std::vector<std::unique_ptr<ast::FunctionParam>>>();
+    auto list = std::make_unique<std::vector<std::unique_ptr<ast::FunctionParam>>>();
     list->push_back(parse_param_declaration(lexer));
 
     return parse_param_declaration_list_r(lexer, std::move(list));
