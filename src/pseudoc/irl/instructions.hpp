@@ -127,4 +127,16 @@ namespace irl
     public:
         std::string print() override;
     };
+
+    class Ret : public Instruction
+    {
+    public:
+        Ret(std::shared_ptr<Value> res, LlvmAtomic tp);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Value> _res;
+        LlvmAtomic _tp;
+    };
 }

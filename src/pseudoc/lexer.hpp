@@ -47,12 +47,17 @@ enum TokenType : int
     STRUCT = 509,
 
     // flow control keywords
-    IF    = 601,
-    ELSE  = 602,
-    WHILE = 603,
-    DO    = 604,
-    FOR   = 605,
-    GOTO  = 606,
+    IF       = 601,
+    ELSE     = 602,
+    WHILE    = 603,
+    DO       = 604,
+    FOR      = 605,
+    GOTO     = 606,
+    RETURN   = 607,
+    SWITCH   = 608,
+    CASE     = 609,
+    BREAK    = 610,
+    CONTINUE = 611,
 
     // errors
     LEX_ERROR = 1001

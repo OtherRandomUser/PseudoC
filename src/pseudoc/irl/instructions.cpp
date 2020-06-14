@@ -167,3 +167,14 @@ std::string EndDef::print()
 {
     return "}\n";
 }
+
+Ret::Ret(std::shared_ptr<Value> res, LlvmAtomic tp):
+    _res(std::move(res))
+{
+    _tp = tp;
+}
+
+std::string Ret::print()
+{
+    return "  ret " + atomic_to_string(_tp) + " " + _res->print();
+}
