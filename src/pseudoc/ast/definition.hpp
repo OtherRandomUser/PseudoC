@@ -38,7 +38,7 @@ namespace ast
     class FunctionDefinition : public Definition
     {
     public:
-        FunctionDefinition(std::string identifier, irl::LlvmAtomic tp, std::vector<std::unique_ptr<FunctionParam>> params, std::unique_ptr<CompoundStatement> body);
+        FunctionDefinition(std::string identifier, irl::LlvmAtomic tp, std::unique_ptr<std::vector<std::unique_ptr<FunctionParam>>> params, std::unique_ptr<CompoundStatement> body);
 
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;

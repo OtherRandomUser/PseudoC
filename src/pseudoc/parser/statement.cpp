@@ -43,7 +43,7 @@ std::unique_ptr<ast::Statement> parse_declaration_statement(Lexer& lexer)
     return std::make_unique<ast::DeclarationStatement>(std::move(decl));
 }
 
-std::unique_ptr<ast::Statement> parse_compound_statement(Lexer& lexer)
+std::unique_ptr<ast::CompoundStatement> parse_compound_statement(Lexer& lexer)
 {
     auto curr = lexer.bump();
 

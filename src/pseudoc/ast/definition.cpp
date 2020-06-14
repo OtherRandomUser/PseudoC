@@ -1,4 +1,4 @@
-#include <ast/definition.hpp>
+#include <pseudoc/ast/definition.hpp>
 
 using namespace ast;
 
@@ -32,9 +32,9 @@ void FunctionParam::add_temp()
     _param_ref = _var_scope->new_temp(_tp);
 }
 
-FunctionDefinition::FunctionDefinition(std::string identifier, irl::LlvmAtomic tp, std::vector<std::unique_ptr<FunctionParam>> params, std::unique_ptr<CompoundStatement> body):
+FunctionDefinition::FunctionDefinition(std::string identifier, irl::LlvmAtomic tp, std::unique_ptr<std::vector<std::unique_ptr<FunctionParam>>> params, std::unique_ptr<CompoundStatement> body):
     _identifier(std::move(identifier)),
-    _params(std::move(params)),
+    _params(std::move(*params)),
     _body(std::move(body))
 {
     _tp = tp;
