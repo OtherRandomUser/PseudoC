@@ -45,7 +45,7 @@ namespace ast
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
-            _body->set_variable_scope(var_scope, ftable);
+            _body->forward_variable_scope(var_scope, ftable);
 
             for (auto& p: _params)
             {

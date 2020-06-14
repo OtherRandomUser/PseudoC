@@ -62,8 +62,6 @@ std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen()
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    // TODO check var scope
-
     irl::FunctionDef def;
     def.tp = _tp;
 
@@ -75,8 +73,7 @@ std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen()
 
     segment->instructions.push_back(std::make_unique<irl::Def>(_identifier, def));
 
-    // TODO start counting vars from zero
-    // TODO skip one var after the params because of reasons
+    _var_scope->skip();
 
     for(auto& p: _params)
     {

@@ -96,13 +96,18 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
 
-        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        void forward_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable)
         {
-            _var_scope = std::make_shared<VariableScope>(std::move(var_scope));
+            _var_scope = std::move(var_scope);
             _ftable = std::move(ftable);
 
             for (auto& statement: _statements)
                 statement->set_variable_scope(_var_scope, _ftable);
+        }
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            forward_variable_scope(std::make_shared<VariableScope>(std::move(var_scope)), std::move(ftable));
         }
 
     private:

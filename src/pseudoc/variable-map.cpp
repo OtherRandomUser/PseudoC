@@ -21,7 +21,7 @@ std::shared_ptr<irl::Variable> VariableScope::add_variable(std::string id, irl::
         auto it = _variables.find(id);
 
         if (it != _variables.end())
-            throw std::logic_error("variable " + id + "redeclared");
+            throw std::logic_error("variable " + id + " redeclared");
     }
 
     auto var = new_temp(tp);
@@ -52,6 +52,11 @@ std::shared_ptr<irl::Variable> VariableScope::new_temp(irl::LlvmAtomic tp)
     var->tp = tp;
 
     return var;
+}
+
+void VariableScope::skip()
+{
+    _name_gen->get_next();
 }
 
 void FunctionTable::add_function(std::string id, irl::FunctionDef def)
