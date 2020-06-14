@@ -160,10 +160,10 @@ std::string Def::print()
 
     params += ")";
 
-    return "define " + atomic_to_string(_def.tp) + " @" + _id + params + " #0 {";
+    return "define " + atomic_to_string(_def.tp) + " @" + _id + params + " #0 {\n";
 }
 
 std::string EndDef::print()
 {
-    return "}";
+    return "}\n";
 }

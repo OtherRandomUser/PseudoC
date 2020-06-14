@@ -13,11 +13,11 @@ namespace ast
         virtual std::string print() override = 0;
         virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
-        virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
-        {
-            _var_scope = std::make_shared<VariableScope>();
-            _ftable = std::move(ftable);
-        }
+        // virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        // {
+        //     _var_scope = std::make_shared<VariableScope>();
+        //     _ftable = std::move(ftable);
+        // }
     };
 
     class FunctionParam : public Definition
@@ -42,6 +42,19 @@ namespace ast
 
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            _body->set_variable_scope(var_scope, ftable);
+
+            for (auto& p: _params)
+            {
+                p->set_variable_scope(var_scope, ftable);
+            }
+
+            _var_scope = std::make_shared<VariableScope>(std::move(var_scope));
+            _ftable = std::move(ftable);
+        }
 
     private:
         std::string _identifier;

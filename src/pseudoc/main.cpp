@@ -29,9 +29,9 @@ int main(int argc, char **argv)
 
     while (!lexer.is_eof())
     {
-        auto ast = parse_statement(lexer);
+        auto ast = parse_definition(lexer);
 
-        std::cout << "Statement:" << std::endl;
+        std::cout << "Definition:" << std::endl;
         std::cout << ast->print() << std::endl << std::endl;
 
         std::cout << "Code Gen" << std::endl;

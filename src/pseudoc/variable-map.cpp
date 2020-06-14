@@ -9,6 +9,7 @@ VariableScope::VariableScope(std::shared_ptr<VariableScope> parent):
     _parent(std::move(parent)),
     _name_gen(parent->_name_gen)
 {
+    int a = 3 + 9;
 }
 
 std::shared_ptr<irl::Variable> VariableScope::add_variable(std::string id, irl::LlvmAtomic tp)

@@ -67,7 +67,7 @@ std::unique_ptr<std::vector<std::unique_ptr<ast::FunctionParam>>> parse_param_de
     if (lexer.peek_current().tk_type == ')')
     {
         lexer.bump();
-        return std::unique_ptr<std::vector<std::unique_ptr<ast::FunctionParam>>>();
+        return std::make_unique<std::vector<std::unique_ptr<ast::FunctionParam>>>();
     }
 
     auto list = std::unique_ptr<std::vector<std::unique_ptr<ast::FunctionParam>>>();
