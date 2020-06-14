@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include <pseudoc/irl/type.hpp>
@@ -36,4 +37,14 @@ protected:
 private:
     std::shared_ptr<VariableScope> _parent;
     std::unordered_map<std::string, std::shared_ptr<irl::Variable>> _variables;
+};
+
+class FunctionTable
+{
+public:
+    void add_function(std::string id, irl::FunctionDef def);
+    irl::FunctionDef get_function(const std::string& id);
+
+private:
+    std::unordered_map<std::string, irl::FunctionDef> _functions;
 };

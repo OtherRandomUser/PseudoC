@@ -140,3 +140,30 @@ std::string SDiv::print()
         + ", " + _rhs->print()
         + "\n";
 }
+
+Def::Def(std::string id, const FunctionDef& def):
+    _id(std::move(id)),
+    _def(def)
+{
+}
+
+std::string Def::print()
+{
+    std::string params = "(";
+    std::string junc = "";
+
+    for (auto& tp: _def.params)
+    {
+        params += junc + atomic_to_string(tp);
+        junc = ", ";
+    }
+
+    params += ")";
+
+    return "define " + atomic_to_string(_def.tp) + " @" + _id + params + " #0 {";
+}
+
+std::string EndDef::print()
+{
+    return "}";
+}

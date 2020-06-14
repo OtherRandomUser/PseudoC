@@ -52,3 +52,26 @@ std::shared_ptr<irl::Variable> VariableScope::new_temp(irl::LlvmAtomic tp)
 
     return var;
 }
+
+void FunctionTable::add_function(std::string id, irl::FunctionDef def)
+{
+    if (!_functions.empty())
+    {
+        auto it = _functions.find(id);
+
+        if (it != _functions.end())
+            throw std::logic_error("redefinition of function " + id);
+    }
+
+    _functions[id] = def;
+}
+
+irl::FunctionDef FunctionTable::get_function(const std::string& id)
+{
+    auto it = _functions.find(id);
+
+    if (it == _functions.end())
+        throw std::logic_error("reference to undeclared function " + id);
+
+    return it->second;
+}

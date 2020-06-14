@@ -2,7 +2,7 @@ add_executable(pseudoc
     pseudoc/ast
     pseudoc/ast/base
     pseudoc/ast/expression
-    pseudoc/ast/function
+    pseudoc/ast/definition
     pseudoc/ast/statement
     pseudoc/irl
     pseudoc/irl/generator
@@ -10,9 +10,10 @@ add_executable(pseudoc
     pseudoc/irl/segment
     pseudoc/irl/type
     pseudoc/irl/value
-    pseudoc/main
     pseudoc/lexer
+    pseudoc/main
     pseudoc/parser
+    pseudoc/parser/definition
     pseudoc/parser/expression
     pseudoc/parser/statement
     pseudoc/variable-map

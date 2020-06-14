@@ -109,4 +109,22 @@ namespace irl
         std::shared_ptr<Value> _rhs;
         LlvmAtomic _tp;
     };
+
+    class Def : public Instruction
+    {
+    public:
+        Def(std::string id, const FunctionDef& def);
+
+        std::string print() override;
+
+    private:
+        std::string _id;
+        FunctionDef _def;
+    };
+
+    class EndDef : public Instruction
+    {
+    public:
+        std::string print() override;
+    };
 }

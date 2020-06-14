@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace irl
 {
@@ -17,4 +18,10 @@ namespace irl
     };
 
     std::string atomic_to_string(LlvmAtomic a);
+
+    struct FunctionDef
+    {
+        LlvmAtomic tp;
+        std::vector<LlvmAtomic> params;
+    };
 }

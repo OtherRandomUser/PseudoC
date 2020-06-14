@@ -15,9 +15,10 @@ namespace ast
         virtual std::string print() override = 0;
         virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
 
-        virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
             _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
         }
     };
 
@@ -29,12 +30,13 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
 
-        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
             if (_initializer)
-                _initializer->set_variable_scope(var_scope);
+                _initializer->set_variable_scope(var_scope, _ftable);
 
             _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
         }
 
     private:
@@ -50,14 +52,15 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
 
-        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
             for (auto& decl: _decls)
             {
-                decl->set_variable_scope(var_scope);
+                decl->set_variable_scope(var_scope, _ftable);
             }
 
             _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
         }
 
         void add_variable(std::unique_ptr<VariableDeclaration> decl);
@@ -74,10 +77,11 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
 
-        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
-            _expr->set_variable_scope(var_scope);
+            _expr->set_variable_scope(var_scope, _ftable);
             _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
         }
 
     private:
@@ -92,12 +96,13 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
 
-        void set_variable_scope(std::shared_ptr<VariableScope> var_scope) override
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
             _var_scope = std::make_shared<VariableScope>(std::move(var_scope));
+            _ftable = std::move(ftable);
 
             for (auto& statement: _statements)
-                statement->set_variable_scope(_var_scope);
+                statement->set_variable_scope(_var_scope, _ftable);
         }
 
     private:

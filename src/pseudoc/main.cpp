@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
     Lexer lexer(src);
     auto scope = std::make_shared<VariableScope>();
+    auto ftable = std::make_shared<FunctionTable>();
 
     while (!lexer.is_eof())
     {
@@ -35,7 +36,7 @@ int main(int argc, char **argv)
 
         std::cout << "Code Gen" << std::endl;
 
-        ast->set_variable_scope(scope);
+        ast->set_variable_scope(scope, ftable);
         auto segment = ast->code_gen();
 
         std::cout << segment->print() << std::endl << std::endl;
