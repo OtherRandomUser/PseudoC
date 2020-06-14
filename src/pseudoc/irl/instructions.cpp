@@ -10,7 +10,7 @@ Alloca::Alloca(std::shared_ptr<Variable> out_var, short alignment):
 
 std::string Alloca::print()
 {
-    return _out_var->print()
+    return "  " + _out_var->print()
         + " = alloca "
         + atomic_to_string(_out_var->tp)
         + ", align "
@@ -27,7 +27,7 @@ Store::Store(std::shared_ptr<Value> from, std::shared_ptr<Value> to, short align
 
 std::string Store::print()
 {
-    std::string res = "store ";
+    std::string res = "  store ";
     return res
         + atomic_to_string(_from->tp)
         + " " + _from->print()
@@ -46,7 +46,7 @@ Load::Load(std::shared_ptr<Variable> from, std::shared_ptr<Variable> to, short a
 
 std::string Load::print()
 {
-    return _to->print()
+    return "  " + _to->print()
         + " = load "
         + atomic_to_string(_to->tp)
         + ", "
@@ -70,7 +70,7 @@ Add::Add(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_
 
 std::string Add::print()
 {
-    return _out->print()
+    return "  " + _out->print()
         + " = add nsw "
         + atomic_to_string(_tp)
         + " " + _lhs->print()
@@ -91,7 +91,7 @@ Sub::Sub(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_
 
 std::string Sub::print()
 {
-    return _out->print()
+    return "  " + _out->print()
         + " = sub nsw "
         + atomic_to_string(_tp)
         + " " + _lhs->print()
@@ -112,7 +112,7 @@ Mul::Mul(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_
 
 std::string Mul::print()
 {
-    return _out->print()
+    return "  " + _out->print()
         + " = mul nsw "
         + atomic_to_string(_tp)
         + " " + _lhs->print()
@@ -133,7 +133,7 @@ SDiv::SDiv(std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::share
 
 std::string SDiv::print()
 {
-    return _out->print()
+    return "  " + _out->print()
         + " = sdiv nsw "
         + atomic_to_string(_tp)
         + " " + _lhs->print()
