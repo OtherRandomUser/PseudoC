@@ -1,5 +1,7 @@
 #include <pseudoc/parser.hpp>
 
+#include <pseudoc/ast/flow.hpp>
+
 bool is_type(const Token& tk)
 {
     return tk.tk_type == TokenType::INT || tk.tk_type == TokenType::FLOAT || tk.tk_type == TokenType::VOID;
@@ -82,6 +84,35 @@ std::unique_ptr<ast::Statement> parse_return_statement(Lexer& lexer)
     return std::make_unique<ast::ReturnStatement>(std::move(expr));
 }
 
+std::unique_ptr<ast::Statement> parse_if_statement(Lexer& lexer)
+{
+    lexer.bump();
+    auto curr = lexer.bump();
+
+    if (curr.tk_type != '(')
+        throw std::logic_error("expected '(' but found '" + curr.lexema + "'");
+
+    auto condition = parse_expression(lexer);
+
+    curr = lexer.bump();
+
+    if (curr.tk_type != ')')
+        throw std::logic_error("expected ')' but found '" + curr.lexema + "'");
+
+    auto on_true = parse_statement(lexer);
+
+    if (lexer.peek_current().tk_type == TokenType::ELSE)
+    {
+        lexer.bump();
+
+        auto on_false = parse_statement(lexer);
+
+        return std::make_unique<ast::IfStatement>(std::move(condition), std::move(on_true), std::move(on_false));
+    }
+
+    return std::make_unique<ast::IfStatement>(std::move(condition), std::move(on_true));
+}
+
 std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 {
     if (is_type(lexer.peek_current()))
@@ -92,6 +123,10 @@ std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 
     if (lexer.peek_current().tk_type == TokenType::RETURN)
         return parse_return_statement(lexer);
+
+    if (lexer.peek_current().tk_type == TokenType::IF)
+        return parse_if_statement(lexer);
+
         
     return parse_expression_statement(lexer);
 }

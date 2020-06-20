@@ -139,4 +139,41 @@ namespace irl
         std::shared_ptr<Value> _res;
         LlvmAtomic _tp;
     };
+
+    class Label : public Instruction
+    {
+    public:
+        Label(std::shared_ptr<Variable> ref);
+
+        std::string print() override;
+
+        std::shared_ptr<Variable> get_ref();
+
+    private:
+        std::shared_ptr<Variable> _ref;
+    };
+
+    class Jump : public Instruction
+    {
+    public:
+        Jump(std::shared_ptr<Variable> label_ref);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Variable> _label_ref;
+    };
+
+    class JumpC : public Instruction
+    {
+    public:
+        JumpC(std::shared_ptr<Value> condition, std::shared_ptr<Variable> on_true, std::shared_ptr<Variable> on_false);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Value> _condition;
+        std::shared_ptr<Variable> _on_true;
+        std::shared_ptr<Variable> _on_false;
+    };
 }

@@ -178,3 +178,40 @@ std::string Ret::print()
 {
     return "  ret " + atomic_to_string(_tp) + " " + _res->print() + "\n";
 }
+
+Label::Label(std::shared_ptr<Variable> ref):
+    _ref(std::move(ref))
+{
+}
+
+std::string Label::print()
+{
+    return "\n; <label>:" + _ref->print() + ":\n";
+}
+
+std::shared_ptr<Variable> Label::get_ref()
+{
+    return _ref;
+}
+
+Jump::Jump(std::shared_ptr<Variable> label_ref):
+    _label_ref(std::move(label_ref))
+{
+}
+
+std::string Jump::print()
+{
+    return "  br label " + _label_ref->print() + "\n";
+}
+
+JumpC::JumpC(std::shared_ptr<Value> condition, std::shared_ptr<Variable> on_true, std::shared_ptr<Variable> on_false):
+    _condition(std::move(condition)),
+    _on_true(std::move(on_true)),
+    _on_false(std::move(on_false))
+{
+}
+
+std::string JumpC::print()
+{
+    return "  br i1 " + _condition->print() + ", label " + _on_true->print() + ", label " + _on_false->print() + "\n";
+}

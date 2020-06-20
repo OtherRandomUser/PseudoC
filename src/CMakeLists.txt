@@ -1,8 +1,9 @@
 add_executable(pseudoc
     pseudoc/ast
     pseudoc/ast/base
-    pseudoc/ast/expression
     pseudoc/ast/definition
+    pseudoc/ast/expression
+    pseudoc/ast/flow
     pseudoc/ast/statement
     pseudoc/irl
     pseudoc/irl/generator
