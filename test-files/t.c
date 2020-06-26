@@ -7,8 +7,7 @@ int main(int argc)
 
     // int d = c > 0 && c != b || a;
 
-    // if (c > 0)
-    if (c )
+    if (c)
         a += c;
     else
         b -= 2;

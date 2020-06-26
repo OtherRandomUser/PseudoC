@@ -94,7 +94,7 @@ std::unique_ptr<ast::Statement> parse_if_statement(Lexer& lexer)
 
     auto condition = parse_expression(lexer);
 
-    if (condition->get_type() != irl::LlvmAtomic::i32)
+    if (condition->get_type() != irl::LlvmAtomic::b)
     {
         condition = std::make_unique<ast::BooleanCast>(std::move(condition));
     }

@@ -44,7 +44,11 @@
         "new": "cpp",
         "sstream": "cpp",
         "stdexcept": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "bit": "cpp",
+        "functional": "cpp",
+        "numeric": "cpp",
+        "random": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.configureOnOpen": false

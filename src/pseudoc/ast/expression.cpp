@@ -212,6 +212,101 @@ std::unique_ptr<irl::IrlSegment> Division::code_gen()
     return segment;
 }
 
+Compare::Compare(Compare::Code code, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
+    BinaryOp(std::move(lhs), std::move(rhs))
+{
+    _code = code;
+    _tp = irl::LlvmAtomic::b;
+}
+
+std::string Compare::print()
+{
+    std::string code;
+
+    switch (_code)
+    {
+    case Code::EQ:
+        code = " == ";
+        break;
+
+    case Code::NE:
+        code = " != ";
+        break;
+
+    case Code::LT:
+        code = " < ";
+        break;
+
+    case Code::LE:
+        code = " <= ";
+        break;
+
+    case Code::GT:
+        code = " > ";
+        break;
+
+    case Code::GE:
+        code = " >= ";
+        break;
+    }
+
+    return "( " + _lhs->print() + code + _rhs->print() + " )";
+}
+
+std::unique_ptr<irl::IrlSegment> Compare::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    irl::ICmp::CondT ct;
+
+    switch (_code)
+    {
+    case Code::EQ:
+        ct = irl::ICmp::CondT::eq;
+        break;
+
+    case Code::NE:
+        ct = irl::ICmp::CondT::ne;
+        break;
+
+    case Code::LT:
+        ct = irl::ICmp::CondT::slt;
+        break;
+
+    case Code::LE:
+        ct = irl::ICmp::CondT::sle;
+        break;
+
+    case Code::GT:
+        ct = irl::ICmp::CondT::sgt;
+        break;
+
+    case Code::GE:
+        ct = irl::ICmp::CondT::sle;
+        break;
+    }
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(_tp);
+    segment->instructions.push_back(std::make_unique<irl::ICmp>(ct, out, std::move(lhs->out_value), std::move(rhs->out_value), tp));
+    segment->out_value = std::move(out);
+
+    return segment;
+}
+
 LogicalAnd::LogicalAnd(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
     BinaryOp(std::move(lhs), std::move(rhs))
 {

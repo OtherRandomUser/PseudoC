@@ -116,6 +116,28 @@ namespace ast
         std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
+    class Compare : public BinaryOp
+    {
+    public:
+        enum Code
+        {
+            EQ,
+            NE,
+            LT,
+            LE,
+            GT,
+            GE
+        };
+
+        Compare(Code code, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+    private:
+        Code _code;
+    };
+
     class LogicalAnd : public BinaryOp
     {
     public:
