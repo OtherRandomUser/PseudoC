@@ -5,8 +5,9 @@ int main(int argc)
     int c = b;
     a = 3 + b / c;
 
-    // if (c > 0)
-    if (c)
+    // int d = c > 0 && c != b || a;
+
+    if (c > 0)
         a = c;
     else
         b = 2;

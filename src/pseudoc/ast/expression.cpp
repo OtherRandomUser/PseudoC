@@ -212,6 +212,68 @@ std::unique_ptr<irl::IrlSegment> Division::code_gen()
     return segment;
 }
 
+LogicalAnd::LogicalAnd(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
+    BinaryOp(std::move(lhs), std::move(rhs))
+{
+}
+
+std::string LogicalAnd::print()
+{
+    return "( " + _lhs->print() + " and " + _rhs->print() + " )";
+}
+
+std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO solve this headache
+
+    return segment;
+}
+
+LogicalOr::LogicalOr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
+    BinaryOp(std::move(lhs), std::move(rhs))
+{
+}
+
+std::string LogicalOr::print()
+{
+    return "( " + _lhs->print() + " and " + _rhs->print() + " )";
+}
+
+std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto lhs = _lhs->code_gen();
+    for (auto& i: lhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto rhs = _rhs->code_gen();
+    for (auto& i: rhs->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    // TODO solve this headache
+
+    return segment;
+}
+
 AssignmentExpression::AssignmentExpression(std::string identifier, std::unique_ptr<Expression> inner):
     _identifier(std::move(identifier)),
     _inner(std::move(inner))

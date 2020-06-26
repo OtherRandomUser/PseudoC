@@ -116,6 +116,24 @@ namespace ast
         std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
 
+    class LogicalAnd : public BinaryOp
+    {
+    public:
+        LogicalAnd(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+    };
+
+    class LogicalOr : public BinaryOp
+    {
+    public:
+        LogicalOr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+    };
+
     class AssignmentExpression : public Expression
     {
     public:
