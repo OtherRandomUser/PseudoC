@@ -96,7 +96,9 @@ std::unique_ptr<ast::Expression> parse_additive_expression(Lexer& lexer)
 
 std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 {
-    if (lexer.peek_next().tk_type == '=')
+    auto curr = lexer.peek_next();
+
+    if (curr.tk_type == '=')
     {
         auto curr = lexer.bump();
 
@@ -108,6 +110,74 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
         auto rhs = parse_additive_expression(lexer);
 
         return std::make_unique<ast::RegularAssignment>(std::move(curr.lexema), std::move(rhs));
+    }
+
+    if (curr.tk_type == TokenType::PLUS_ASSIGNMENT)
+    {
+        auto variable = lexer.bump();
+
+        if (variable.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("parse error on parse_assignment_expression (lhs)");
+
+        auto var_ref = std::make_unique<ast::VariableRef>(variable.lexema);
+
+        lexer.bump();
+
+        auto rhs = parse_additive_expression(lexer);
+        rhs = std::make_unique<ast::Addition>(std::move(var_ref), std::move(rhs));
+
+        return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
+    }
+
+    if (curr.tk_type == TokenType::MINUS_ASSIGNMENT)
+    {
+        auto variable = lexer.bump();
+
+        if (variable.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("parse error on parse_assignment_expression (lhs)");
+
+        auto var_ref = std::make_unique<ast::VariableRef>(variable.lexema);
+
+        lexer.bump();
+
+        auto rhs = parse_additive_expression(lexer);
+        rhs = std::make_unique<ast::Subtraction>(std::move(var_ref), std::move(rhs));
+
+        return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
+    }
+
+    if (curr.tk_type == TokenType::TIMES_ASSIGNMENT)
+    {
+        auto variable = lexer.bump();
+
+        if (variable.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("parse error on parse_assignment_expression (lhs)");
+
+        auto var_ref = std::make_unique<ast::VariableRef>(variable.lexema);
+
+        lexer.bump();
+
+        auto rhs = parse_additive_expression(lexer);
+        rhs = std::make_unique<ast::Multiplication>(std::move(var_ref), std::move(rhs));
+
+        return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
+    }
+
+    if (curr.tk_type == TokenType::DIVIDE_ASSIGNMENT)
+    {
+        auto variable = lexer.bump();
+
+        if (variable.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("parse error on parse_assignment_expression (lhs)");
+
+        auto var_ref = std::make_unique<ast::VariableRef>(variable.lexema);
+
+        lexer.bump();
+
+        auto rhs = parse_additive_expression(lexer);
+        rhs = std::make_unique<ast::Division>(std::move(var_ref), std::move(rhs));
+
+        return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
     }
 
     return parse_additive_expression(lexer);

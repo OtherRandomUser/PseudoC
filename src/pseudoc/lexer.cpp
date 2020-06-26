@@ -80,8 +80,8 @@ Token Lexer::_read_token()
 
     auto token = _create_ascii_token(c, d);
 
-    _current_pos++;
-    _current_col++;
+    _current_pos += token.lexema.size();
+    _current_col += token.lexema.size();
 
     return token;
 }
