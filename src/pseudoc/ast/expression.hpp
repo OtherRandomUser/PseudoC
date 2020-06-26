@@ -145,4 +145,24 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen() override;
     };
+
+    class BooleanCast : public Expression
+    {
+    public:
+        BooleanCast(std::unique_ptr<Expression> inner);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            _inner->set_variable_scope(var_scope, ftable);
+
+            _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
+        }
+
+    private:
+        std::unique_ptr<Expression> _inner;
+    };
 }

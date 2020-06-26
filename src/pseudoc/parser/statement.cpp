@@ -94,6 +94,11 @@ std::unique_ptr<ast::Statement> parse_if_statement(Lexer& lexer)
 
     auto condition = parse_expression(lexer);
 
+    if (condition->get_type() != irl::LlvmAtomic::i32)
+    {
+        condition = std::make_unique<ast::BooleanCast>(std::move(condition));
+    }
+
     curr = lexer.bump();
 
     if (curr.tk_type != ')')

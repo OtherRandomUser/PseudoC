@@ -272,7 +272,7 @@ std::string ICmp::print()
         break;
     }
 
-    return _out->print() + " = icmp " + t + " "
+    return "  " + _out->print() + " = icmp " + t + " "
         + atomic_to_string(_tp) + " "
         + _lhs->print() + ", "
         + _rhs->print() + "\n";

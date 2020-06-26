@@ -245,3 +245,35 @@ std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen()
 
     return segment;
 }
+
+BooleanCast::BooleanCast(std::unique_ptr<Expression> inner):
+    _inner(std::move(inner))
+{
+    _tp = irl::LlvmAtomic::b;
+}
+
+std::string BooleanCast::print()
+{
+    return "(bool) " + _inner->print();
+}
+
+std::unique_ptr<irl::IrlSegment> BooleanCast::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+    auto inner = _inner->code_gen();
+    auto ref = _var_scope->new_temp(irl::LlvmAtomic::b);
+
+    for (auto& i: inner->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto zero = std::make_unique<irl::IntLiteral>();
+    zero->tp = irl::LlvmAtomic::i32;
+    zero->value = 0;
+
+    segment->instructions.push_back(std::make_unique<irl::ICmp>(irl::ICmp::ne, ref, std::move(inner->out_value), std::move(zero), irl::LlvmAtomic::i32));
+
+    segment->out_value = std::move(ref);
+    return segment;
+}
