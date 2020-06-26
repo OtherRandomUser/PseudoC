@@ -76,7 +76,9 @@ Token Lexer::_read_token()
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_')
         return _read_identifier_or_keyword();
 
-    auto token = _create_ascii_token(c);
+    char d = _current_pos + 1 != _src.length() ? _src.at(_current_pos + 1) : 0;
+
+    auto token = _create_ascii_token(c, d);
 
     _current_pos++;
     _current_col++;
@@ -144,7 +146,7 @@ Token Lexer::_read_newline()
     _current_row++;
     _current_row = 0;
 
-    return _create_ascii_token('\n');
+    return _create_ascii_token('\n', '\0');
 }
 
 Token Lexer::_read_whitespace()
@@ -329,11 +331,86 @@ Token Lexer::_read_identifier_or_keyword()
     };
 }
 
-Token Lexer::_create_ascii_token(char c)
+Token Lexer::_create_ascii_token(char c, char d)
 {
+    auto tp = (TokenType) c;
+    std::string lexema{c};
+
+    if (c == '+' && d == '+')
+    {
+        tp = TokenType::INCREMENT;
+        lexema = "++";
+    }
+
+    if (c == '-' && d == '-')
+    {
+        tp = TokenType::DECREMENT;
+        lexema = "--";
+    }
+
+    if (c == '=' && d == '=')
+    {
+        tp = TokenType::EQUALS;
+        lexema = "==";
+    }
+
+    if (c == '!' && d == '=')
+    {
+        tp = TokenType::NOT_EQUAL;
+        lexema = "!=";
+    }
+
+    if (c == '<' && d == '=')
+    {
+        tp = TokenType::LESS_THAN;
+        lexema = "<=";
+    }
+
+    if (c == '>' && d == '=')
+    {
+        tp = TokenType::MORE_THAN;
+        lexema = ">=";
+    }
+
+    if (c == '+' && d == '=')
+    {
+        tp = TokenType::PLUS_ASSIGNMENT;
+        lexema = "+=";
+    }
+
+    if (c == '-' && d == '=')
+    {
+        tp = TokenType::MINUS_ASSIGNMENT;
+        lexema = "-=";
+    }
+
+    if (c == '*' && d == '=')
+    {
+        tp = TokenType::TIMES_ASSIGNMENT;
+        lexema = "*=";
+    }
+
+    if (c == '/' && d == '=')
+    {
+        tp = TokenType::DIVIDE_ASSIGNMENT;
+        lexema = "/=";
+    }
+
+    if (c == '&' && d == '&')
+    {
+        tp = TokenType::LOGICAL_AND;
+        lexema = "==";
+    }
+
+    if (c == '|' && d == '|')
+    {
+        tp = TokenType::LOGICAL_OR;
+        lexema = "==";
+    }
+
     return {
-        .tk_type = (TokenType) c,
-        .lexema = std::string{c},
+        .tk_type = tp,
+        .lexema = lexema,
         .row = _current_row,
         .col = _current_col
     };

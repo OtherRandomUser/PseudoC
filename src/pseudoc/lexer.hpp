@@ -33,7 +33,8 @@ enum TokenType : int
     MINUS_ASSIGNMENT  = 408, // -=
     TIMES_ASSIGNMENT  = 409, // *=
     DIVIDE_ASSIGNMENT = 410, // /=
-    // TODO bitwise assignment
+    LOGICAL_AND       = 421, // &&
+    LOGICAL_OR        = 422, // ||
 
     // type keywords
     VOID   = 501,
@@ -105,5 +106,5 @@ private:
     void _eat_whitespace();
     void _eat_comment_ln();
 
-    Token _create_ascii_token(char c);
+    Token _create_ascii_token(char c, char d);
 };
