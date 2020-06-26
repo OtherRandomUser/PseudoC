@@ -14,7 +14,8 @@ namespace irl
         i32,
         i64,
         fp,
-        db
+        db,
+        b
     };
 
     std::string atomic_to_string(LlvmAtomic a);

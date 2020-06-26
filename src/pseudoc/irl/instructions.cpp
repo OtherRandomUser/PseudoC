@@ -215,3 +215,65 @@ std::string JumpC::print()
 {
     return "  br i1 " + _condition->print() + ", label " + _on_true->print() + ", label " + _on_false->print() + "\n";
 }
+
+ICmp::ICmp(ICmp::CondT cond, std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp):
+    _cond(std::move(cond)),
+    _out(std::move(out)),
+    _lhs(std::move(lhs))
+{
+    _rhs = rhs;
+    _tp = tp;
+}
+
+std::string ICmp::print()
+{
+    std::string t;
+
+    switch (_cond)
+    {
+    case CondT::eq:
+        t = "eq";
+        break;
+
+    case CondT::ne:
+        t = "ne";
+        break;
+
+    case CondT::ugt:
+        t = "ugt";
+        break;
+
+    case CondT::uge:
+        t = "uge";
+        break;
+
+    case CondT::ult:
+        t = "ult";
+        break;
+
+    case CondT::ule:
+        t = "ule";
+        break;
+
+    case CondT::sgt:
+        t = "sgt";
+        break;
+
+    case CondT::sge:
+        t = "sge";
+        break;
+
+    case CondT::slt:
+        t = "slt";
+        break;
+
+    case CondT::sle:
+        t = "sle";
+        break;
+    }
+
+    return _out->print() + " = icmp " + t + " "
+        + atomic_to_string(_tp) + " "
+        + _lhs->print() + ", "
+        + _rhs->print() + "\n";
+}

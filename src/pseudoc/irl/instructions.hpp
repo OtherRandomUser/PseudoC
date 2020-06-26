@@ -176,4 +176,33 @@ namespace irl
         std::shared_ptr<Variable> _on_true;
         std::shared_ptr<Variable> _on_false;
     };
+
+    class ICmp : public Instruction
+    {
+    public:
+        enum CondT
+        {
+            eq,
+            ne,
+            ugt,
+            uge,
+            ult,
+            ule,
+            sgt,
+            sge,
+            slt,
+            sle
+        };
+
+        ICmp(CondT cond, std::shared_ptr<Variable> out, std::shared_ptr<Value> lhs, std::shared_ptr<Value> rhs, LlvmAtomic tp);
+
+        std::string print() override;
+
+    private:
+        CondT _cond;
+        std::shared_ptr<Variable> _out;
+        std::shared_ptr<Value> _lhs;
+        std::shared_ptr<Value> _rhs;
+        LlvmAtomic _tp;
+    };
 }
