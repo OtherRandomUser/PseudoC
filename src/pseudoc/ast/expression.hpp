@@ -58,6 +58,32 @@ namespace ast
         std::string _identifier;
     };
 
+    class PreIncrement : public Expression
+    {
+    public:
+        PreIncrement(std::string identifier, int value);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+    private:
+        std::string _identifier;
+        int _value;
+    };
+
+    class PostIncrement : public Expression
+    {
+    public:
+        PostIncrement(std::string identifier, int value);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen() override;
+
+    private:
+        std::string _identifier;
+        int _value;
+    };
+
     class BinaryOp : public Expression
     {
     public:

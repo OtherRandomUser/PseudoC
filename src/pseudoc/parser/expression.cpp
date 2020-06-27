@@ -19,12 +19,44 @@ std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
     throw std::logic_error("parse error on parse_primary_expression");
 }
 
+std::unique_ptr<ast::Expression> parse_increment_expression(Lexer& lexer)
+{
+    auto curr = lexer.peek_current();
+
+    if (curr.tk_type == TokenType::INCREMENT || curr.tk_type == TokenType::DECREMENT)
+    {
+        lexer.bump();
+        auto id = lexer.bump();
+
+        if (id.tk_type != TokenType::IDENTIFIER)
+            throw std::logic_error("Expected an identifier but found " + id.lexema);
+
+        int value = curr.tk_type == TokenType::INCREMENT ? 1 : -1;
+
+        return std::make_unique<ast::PreIncrement>(std::move(id.lexema), value);
+    }
+
+    auto next = lexer.peek_next();
+
+    if (curr.tk_type == TokenType::IDENTIFIER && (next.tk_type == TokenType::INCREMENT || next.tk_type == TokenType::DECREMENT))
+    {
+        lexer.bump();
+        lexer.bump();
+
+        int value = next.tk_type == TokenType::INCREMENT ? 1 : -1;
+
+        return std::make_unique<ast::PostIncrement>(std::move(curr.lexema), value);
+    }
+
+    return parse_primary_expression(lexer);
+}
+
 std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
 {
     if (lexer.peek_current().tk_type == '*')
     {
         lexer.bump();
-        auto rhs = parse_primary_expression(lexer);
+        auto rhs = parse_increment_expression(lexer);
         auto expr = std::make_unique<ast::Multiplication>(std::move(lhs), std::move(rhs));
 
         return parse_multiplicative_expression_r(lexer, std::move(expr));
@@ -33,7 +65,7 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
     if (lexer.peek_current().tk_type == '/')
     {
         lexer.bump();
-        auto rhs = parse_primary_expression(lexer);
+        auto rhs = parse_increment_expression(lexer);
         auto expr = std::make_unique<ast::Division>(std::move(lhs), std::move(rhs));
 
         return parse_multiplicative_expression_r(lexer, std::move(expr));
@@ -61,7 +93,7 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
 
 std::unique_ptr<ast::Expression> parse_multiplicative_expression(Lexer& lexer)
 {
-    auto lhs = parse_primary_expression(lexer);
+    auto lhs = parse_increment_expression(lexer);
     return parse_multiplicative_expression_r(lexer, std::move(lhs));
 }
 

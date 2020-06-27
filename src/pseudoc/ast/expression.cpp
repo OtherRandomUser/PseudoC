@@ -66,6 +66,72 @@ std::unique_ptr<irl::IrlSegment> VariableRef::code_gen()
     return segment;
 }
 
+PreIncrement::PreIncrement(std::string identifier, int value):
+    _identifier(std::move(identifier))
+{
+    _value = value;
+}
+
+std::string PreIncrement::print()
+{
+    return "++(" + std::to_string(_value) + ") " + _identifier;
+}
+
+std::unique_ptr<irl::IrlSegment> PreIncrement::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto ref = _var_scope->get_variable(_identifier);
+    auto tp = ref->tp;
+    auto ld_out = _var_scope->new_temp(tp);
+    auto out = _var_scope->new_temp(tp);
+
+    auto literal = std::make_unique<irl::IntLiteral>();
+
+    literal->tp = tp;
+    literal->value = _value;
+
+    segment->instructions.push_back(std::make_unique<irl::Load>(ref, ld_out, 4));
+    segment->instructions.push_back(std::make_unique<irl::Add>(out, ld_out, std::move(literal), tp));
+    segment->instructions.push_back(std::make_unique<irl::Store>(out, std::move(ref), 4));
+    segment->out_value = std::move(out);
+
+    return segment;
+}
+
+PostIncrement::PostIncrement(std::string identifier, int value):
+    _identifier(std::move(identifier))
+{
+    _value = value;
+}
+
+std::string PostIncrement::print()
+{
+    return _identifier + " ++(" + std::to_string(_value) + ")";
+}
+
+std::unique_ptr<irl::IrlSegment> PostIncrement::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto ref = _var_scope->get_variable(_identifier);
+    auto tp = ref->tp;
+    auto out = _var_scope->new_temp(tp);
+    auto inc_out = _var_scope->new_temp(tp);
+
+    auto literal = std::make_unique<irl::IntLiteral>();
+
+    literal->tp = tp;
+    literal->value = _value;
+
+    segment->instructions.push_back(std::make_unique<irl::Load>(ref, out, 4));
+    segment->instructions.push_back(std::make_unique<irl::Add>(inc_out, out, std::move(literal), tp));
+    segment->instructions.push_back(std::make_unique<irl::Store>(std::move(inc_out), std::move(ref), 4));
+    segment->out_value = std::move(out);
+
+    return segment;
+}
+
 BinaryOp::BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
     _lhs(std::move(lhs)),
     _rhs(std::move(rhs))
