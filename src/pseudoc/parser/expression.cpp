@@ -13,10 +13,18 @@ std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
         // TODO parse other literals
         return std::make_unique<ast::I32Constant>(std::stoi(curr.lexema));
 
-    std::cout << curr.tk_type << " " << curr.lexema << std::endl;
+    if (curr.tk_type == '(')
+    {
+        auto expr = parse_expression(lexer);
+        curr = lexer.bump();
 
-    // TODO better error handling
-    throw std::logic_error("parse error on parse_primary_expression");
+        if (curr.tk_type != ')')
+            throw std::logic_error("expected ) but found " + curr.lexema);
+
+        return expr;
+    }
+
+    throw std::logic_error("expected primary expression but found " + curr.lexema);
 }
 
 std::unique_ptr<ast::Expression> parse_increment_expression(Lexer& lexer)
