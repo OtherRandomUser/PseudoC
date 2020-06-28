@@ -19,7 +19,7 @@ namespace irl
     {
         std::string id;
 
-        std::string print() override
+        virtual std::string print() override
         {
             return id;
         }
@@ -32,6 +32,30 @@ namespace irl
         std::string print() override
         {
             return std::to_string(value);
+        }
+    };
+
+    struct Placeholder : public Variable
+    {
+        Placeholder()
+        {
+            id = "";
+        }
+
+        void fix_id(std::string id)
+        {
+            if (this->id != "")
+                throw std::logic_error("id was already fixed");
+
+            this->id = id;
+        }
+
+        std::string print() override
+        {
+            if (this->id == "")
+                throw std::logic_error("id was not fixed");
+
+            return id;
         }
     };
 }

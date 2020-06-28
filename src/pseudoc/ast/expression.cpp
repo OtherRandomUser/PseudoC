@@ -14,7 +14,7 @@ std::string I32Constant::print()
     return std::to_string(_value);
 }
 
-std::unique_ptr<irl::IrlSegment> I32Constant::code_gen()
+std::unique_ptr<irl::IrlSegment> I32Constant::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
     auto literal = std::make_unique<irl::IntLiteral>();
@@ -37,7 +37,7 @@ std::string F32Constant::print()
     return std::to_string(_value);
 }
 
-std::unique_ptr<irl::IrlSegment> F32Constant::code_gen()
+std::unique_ptr<irl::IrlSegment> F32Constant::code_gen(irl::Context context)
 {
     // TODO
     return std::make_unique<irl::IrlSegment>();
@@ -53,7 +53,7 @@ std::string VariableRef::print()
     return _identifier;
 }
 
-std::unique_ptr<irl::IrlSegment> VariableRef::code_gen()
+std::unique_ptr<irl::IrlSegment> VariableRef::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
@@ -77,7 +77,7 @@ std::string PreIncrement::print()
     return "++(" + std::to_string(_value) + ") " + _identifier;
 }
 
-std::unique_ptr<irl::IrlSegment> PreIncrement::code_gen()
+std::unique_ptr<irl::IrlSegment> PreIncrement::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
@@ -110,7 +110,7 @@ std::string PostIncrement::print()
     return _identifier + " ++(" + std::to_string(_value) + ")";
 }
 
-std::unique_ptr<irl::IrlSegment> PostIncrement::code_gen()
+std::unique_ptr<irl::IrlSegment> PostIncrement::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
@@ -148,17 +148,17 @@ std::string Addition::print()
     return "( " + _lhs->print() + " + " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Addition::code_gen()
+std::unique_ptr<irl::IrlSegment> Addition::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -183,17 +183,17 @@ std::string Subtraction::print()
     return "( " + _lhs->print() + " - " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Subtraction::code_gen()
+std::unique_ptr<irl::IrlSegment> Subtraction::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -218,17 +218,17 @@ std::string Multiplication::print()
     return "( " + _lhs->print() + " * " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Multiplication::code_gen()
+std::unique_ptr<irl::IrlSegment> Multiplication::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -253,17 +253,17 @@ std::string Division::print()
     return "( " + _lhs->print() + " / " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Division::code_gen()
+std::unique_ptr<irl::IrlSegment> Division::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -319,17 +319,17 @@ std::string Compare::print()
     return "( " + _lhs->print() + code + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> Compare::code_gen()
+std::unique_ptr<irl::IrlSegment> Compare::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -383,17 +383,17 @@ std::string LogicalAnd::print()
     return "( " + _lhs->print() + " and " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen()
+std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -414,17 +414,17 @@ std::string LogicalOr::print()
     return "( " + _lhs->print() + " and " + _rhs->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen()
+std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto lhs = _lhs->code_gen();
+    auto lhs = _lhs->code_gen(context);
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen();
+    auto rhs = _rhs->code_gen(std::move(context));
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -451,13 +451,13 @@ std::string RegularAssignment::print()
     return "( " + _identifier + " = " + _inner->print() + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen()
+std::unique_ptr<irl::IrlSegment> RegularAssignment::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
     auto ref = _var_scope->get_variable(_identifier);
 
-    auto inner = _inner->code_gen();
+    auto inner = _inner->code_gen(std::move(context));
     for (auto& i: inner->instructions)
     {
         segment->instructions.push_back(std::move(i));
@@ -480,10 +480,10 @@ std::string BooleanCast::print()
     return "(bool) " + _inner->print();
 }
 
-std::unique_ptr<irl::IrlSegment> BooleanCast::code_gen()
+std::unique_ptr<irl::IrlSegment> BooleanCast::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
-    auto inner = _inner->code_gen();
+    auto inner = _inner->code_gen(std::move(context));
     auto ref = _var_scope->new_temp(irl::LlvmAtomic::b);
 
     for (auto& i: inner->instructions)

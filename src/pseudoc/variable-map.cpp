@@ -59,6 +59,16 @@ void VariableScope::skip()
     _name_gen->get_next();
 }
 
+std::shared_ptr<irl::Placeholder> VariableScope::new_placeholder(irl::LlvmAtomic tp)
+{
+    return std::make_shared<irl::Placeholder>();
+}
+
+void VariableScope::fix_placehoder(std::shared_ptr<irl::Placeholder> placeholder)
+{
+    placeholder->fix_id('\%' + _name_gen->get_next());
+}
+
 void FunctionTable::add_function(std::string id, irl::FunctionDef def)
 {
     if (!_functions.empty())

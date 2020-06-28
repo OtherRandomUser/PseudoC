@@ -11,7 +11,7 @@ namespace ast
         IfStatement(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> on_true, std::unique_ptr<Statement> on_false);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override;
 
@@ -27,12 +27,19 @@ namespace ast
         WhileLoop(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> body);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override;
 
     private:
         std::unique_ptr<Expression> _condition;
         std::unique_ptr<Statement> _body;
+    };
+
+    class Continue : public Statement
+    {
+    public:
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 }

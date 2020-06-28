@@ -32,6 +32,9 @@ public:
     std::shared_ptr<irl::Variable> new_temp(irl::LlvmAtomic tp);
     void skip();
 
+    std::shared_ptr<irl::Placeholder> new_placeholder(irl::LlvmAtomic tp);
+    void fix_placehoder(std::shared_ptr<irl::Placeholder> placeholder);
+
 protected:
     std::shared_ptr<IrlNameGenerator> _name_gen;
 

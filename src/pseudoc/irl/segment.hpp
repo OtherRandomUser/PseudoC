@@ -15,4 +15,10 @@ namespace irl
 
         std::string print();
     };
+
+    struct Context
+    {
+        std::shared_ptr<Variable> continue_label;
+        std::shared_ptr<Variable> break_label;
+    };
 }

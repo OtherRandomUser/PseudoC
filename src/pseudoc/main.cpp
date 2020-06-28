@@ -27,6 +27,10 @@ int main(int argc, char **argv)
     auto scope = std::make_shared<VariableScope>();
     auto ftable = std::make_shared<FunctionTable>();
 
+    irl::Context base_context;
+    base_context.break_label = nullptr;
+    base_context.continue_label = nullptr;
+
     while (!lexer.is_eof())
     {
         auto ast = parse_definition(lexer);
@@ -37,7 +41,7 @@ int main(int argc, char **argv)
         std::cout << "Code Gen" << std::endl;
 
         ast->set_variable_scope(scope, ftable);
-        auto segment = ast->code_gen();
+        auto segment = ast->code_gen(base_context);
 
         std::cout << segment->print() << std::endl << std::endl;
     }

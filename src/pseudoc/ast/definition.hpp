@@ -11,7 +11,7 @@ namespace ast
         ~Definition() = default;
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override = 0;
 
         // virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         // {
@@ -26,7 +26,7 @@ namespace ast
         FunctionParam(std::string identifier, irl::LlvmAtomic tp);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
         void add_temp();
 
@@ -41,7 +41,7 @@ namespace ast
         FunctionDefinition(std::string identifier, irl::LlvmAtomic tp, std::unique_ptr<std::vector<std::unique_ptr<FunctionParam>>> params, std::unique_ptr<CompoundStatement> body);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {

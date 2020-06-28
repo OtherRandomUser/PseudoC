@@ -13,21 +13,29 @@ define dso_local i32 @main(i32 %0) #0 {
   store i32 0, i32* %4, align 4
   br label %5
 
-5:                                                ; preds = %8, %1
+5:                                                ; preds = %12, %11, %1
   %6 = load i32, i32* %4, align 4
   %7 = icmp slt i32 %6, 1500
-  br i1 %7, label %8, label %12
+  br i1 %7, label %8, label %16
 
 8:                                                ; preds = %5
-  %9 = load i32, i32* %3, align 4
-  %10 = load i32, i32* %4, align 4
-  %11 = mul nsw i32 %10, %9
-  store i32 %11, i32* %4, align 4
+  %9 = load i32, i32* %4, align 4
+  %10 = icmp sgt i32 %9, 2000
+  br i1 %10, label %11, label %12
+
+11:                                               ; preds = %8
   br label %5
 
-12:                                               ; preds = %5
-  %13 = load i32, i32* %4, align 4
-  ret i32 %13
+12:                                               ; preds = %8
+  %13 = load i32, i32* %3, align 4
+  %14 = load i32, i32* %4, align 4
+  %15 = mul nsw i32 %14, %13
+  store i32 %15, i32* %4, align 4
+  br label %5
+
+16:                                               ; preds = %5
+  %17 = load i32, i32* %4, align 4
+  ret i32 %17
 }
 
 attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }

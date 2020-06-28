@@ -13,7 +13,7 @@ std::string VariableDeclaration::print()
     return "var (" + _identifier + " = " + (_initializer ? _initializer->print() : "<null>") +")";
 }
 
-std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
+std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen(irl::Context context)
 {
     auto segment =  std::make_unique<irl::IrlSegment>();
 
@@ -29,7 +29,7 @@ std::unique_ptr<irl::IrlSegment> VariableDeclaration::code_gen()
     if (_initializer)
     {
         // initializer expr
-        auto inner = _initializer->code_gen();
+        auto inner = _initializer->code_gen(std::move(context));
 
         // merge initializer instructions
         for (auto& i: inner->instructions)
@@ -63,13 +63,13 @@ std::string DeclarationStatement::print()
     return res + " )";
 }
 
-std::unique_ptr<irl::IrlSegment> DeclarationStatement::code_gen()
+std::unique_ptr<irl::IrlSegment> DeclarationStatement::code_gen(irl::Context context)
 {
     auto segment =  std::make_unique<irl::IrlSegment>();
 
     for (auto& d: _decls)
     {
-        auto inner = d->code_gen();
+        auto inner = d->code_gen(context);
 
         for (auto& i: inner->instructions)
         {
@@ -95,9 +95,9 @@ std::string ExpressionStatement::print()
     return _expr->print();
 }
 
-std::unique_ptr<irl::IrlSegment> ExpressionStatement::code_gen()
+std::unique_ptr<irl::IrlSegment> ExpressionStatement::code_gen(irl::Context context)
 {
-    auto segment = _expr->code_gen();
+    auto segment = _expr->code_gen(std::move(context));
     return segment;
 }
 
@@ -111,10 +111,10 @@ std::string ReturnStatement::print()
     return "ret " + _expr->print();
 }
 
-std::unique_ptr<irl::IrlSegment> ReturnStatement::code_gen()
+std::unique_ptr<irl::IrlSegment> ReturnStatement::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
-    auto expr = _expr->code_gen();
+    auto expr = _expr->code_gen(std::move(context));
 
     for (auto& i: expr->instructions)
     {
@@ -144,13 +144,13 @@ std::string CompoundStatement::print()
     
 }
 
-std::unique_ptr<irl::IrlSegment> CompoundStatement::code_gen()
+std::unique_ptr<irl::IrlSegment> CompoundStatement::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
     for (auto& statement: _statements)
     {
-        auto inner = statement->code_gen();
+        auto inner = statement->code_gen(context);
 
         for (auto& i: inner->instructions)
         {

@@ -13,7 +13,7 @@ namespace ast
         virtual ~Expression() = default;
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override = 0;
 
         virtual void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
@@ -28,7 +28,7 @@ namespace ast
         I32Constant(int value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         int _value;
@@ -40,7 +40,7 @@ namespace ast
         F32Constant(float value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         float _value;
@@ -52,7 +52,7 @@ namespace ast
         VariableRef(std::string identifier);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         std::string _identifier;
@@ -64,7 +64,7 @@ namespace ast
         PreIncrement(std::string identifier, int value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         std::string _identifier;
@@ -77,7 +77,7 @@ namespace ast
         PostIncrement(std::string identifier, int value);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         std::string _identifier;
@@ -90,7 +90,7 @@ namespace ast
         BinaryOp(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override = 0;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
@@ -112,7 +112,7 @@ namespace ast
         Addition(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class Subtraction : public BinaryOp
@@ -121,7 +121,7 @@ namespace ast
         Subtraction(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class Multiplication : public BinaryOp
@@ -130,7 +130,7 @@ namespace ast
         Multiplication(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class Division : public BinaryOp
@@ -139,7 +139,7 @@ namespace ast
         Division(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class Compare : public BinaryOp
@@ -158,7 +158,7 @@ namespace ast
         Compare(Code code, std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
     private:
         Code _code;
@@ -170,7 +170,7 @@ namespace ast
         LogicalAnd(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class LogicalOr : public BinaryOp
@@ -179,7 +179,7 @@ namespace ast
         LogicalOr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class AssignmentExpression : public Expression
@@ -188,7 +188,7 @@ namespace ast
         AssignmentExpression(std::string identifier, std::unique_ptr<Expression> inner);
 
         virtual std::string print() override = 0;
-        virtual std::unique_ptr<irl::IrlSegment> code_gen() override = 0;
+        virtual std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override = 0;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
@@ -209,7 +209,7 @@ namespace ast
         RegularAssignment(std::string identifier, std::unique_ptr<Expression> inner);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
 
     class BooleanCast : public Expression
@@ -218,7 +218,7 @@ namespace ast
         BooleanCast(std::unique_ptr<Expression> inner);
 
         std::string print() override;
-        std::unique_ptr<irl::IrlSegment> code_gen() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {

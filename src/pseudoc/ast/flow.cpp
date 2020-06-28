@@ -26,11 +26,11 @@ std::string IfStatement::print()
             + _on_true->print();
 }
 
-std::unique_ptr<irl::IrlSegment> IfStatement::code_gen()
+std::unique_ptr<irl::IrlSegment> IfStatement::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
-    auto condition = _condition->code_gen();
+    auto condition = _condition->code_gen(context);
 
     for (auto& i: condition->instructions)
     {
@@ -38,7 +38,7 @@ std::unique_ptr<irl::IrlSegment> IfStatement::code_gen()
     }
 
     auto ref_true = _var_scope->new_temp(irl::LlvmAtomic::v);
-    auto on_true = _on_true->code_gen();
+    auto on_true = _on_true->code_gen(context);
 
     if (!_on_false)
     {
@@ -60,7 +60,7 @@ std::unique_ptr<irl::IrlSegment> IfStatement::code_gen()
     }
 
     auto ref_false = _var_scope->new_temp(irl::LlvmAtomic::v);
-    auto on_false = _on_false->code_gen();
+    auto on_false = _on_false->code_gen(std::move(context));
 
     auto ref_end = _var_scope->new_temp(irl::LlvmAtomic::v);
 
@@ -110,18 +110,24 @@ std::string WhileLoop::print()
         + ")\ndo " + _body->print();
 }
 
-std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen()
+std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
     // prepare refs and code generation
     auto ref_condition = _var_scope->new_temp(irl::LlvmAtomic::v);
-    auto condition = _condition->code_gen();
+    auto condition = _condition->code_gen(context);
+
+    auto ref_end = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+
+    irl::Context lcontext;
+    lcontext.break_label = ref_end;
+    lcontext.continue_label = ref_condition;
 
     auto ref_body = _var_scope->new_temp(irl::LlvmAtomic::v);
-    auto body = _body->code_gen();
+    auto body = _body->code_gen(lcontext);
 
-    auto ref_end = _var_scope->new_temp(irl::LlvmAtomic::v);
+    _var_scope->fix_placehoder(ref_end);
 
     // build code segment
     segment->instructions.push_back(std::make_unique<irl::Jump>(ref_condition));
@@ -153,4 +159,21 @@ void WhileLoop::set_variable_scope(std::shared_ptr<VariableScope> var_scope, std
 
     _var_scope = std::move(var_scope);
     _ftable = std::move(ftable);
+}
+
+std::string Continue::print()
+{
+    return "continue\n";
+}
+
+std::unique_ptr<irl::IrlSegment> Continue::code_gen(irl::Context context)
+{
+    if (!context.continue_label)
+        throw std::logic_error("continue called outside a loop");
+
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(context.continue_label));
+
+    return segment;
 }

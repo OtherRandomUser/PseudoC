@@ -13,7 +13,7 @@ std::string FunctionParam::print()
     return irl::atomic_to_string(_tp) + " " + _identifier;
 }
 
-std::unique_ptr<irl::IrlSegment> FunctionParam::code_gen()
+std::unique_ptr<irl::IrlSegment> FunctionParam::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
@@ -58,7 +58,7 @@ std::string FunctionDefinition::print()
         + _body->print() + "\n";
 }
 
-std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen()
+std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
@@ -77,7 +77,7 @@ std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen()
 
     for(auto& p: _params)
     {
-        auto s = p->code_gen();
+        auto s = p->code_gen(context);
 
         for (auto& i: s->instructions)
         {
@@ -85,7 +85,11 @@ std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen()
         }
     }
 
-    auto body = _body->code_gen();
+    irl::Context fcontext;
+    fcontext.continue_label = nullptr;
+    fcontext.break_label = nullptr;
+
+    auto body = _body->code_gen(std::move(fcontext));
 
     for (auto& i: body->instructions)
     {
