@@ -177,3 +177,20 @@ std::unique_ptr<irl::IrlSegment> Continue::code_gen(irl::Context context)
 
     return segment;
 }
+
+std::string Break::print()
+{
+    return "break\n";
+}
+
+std::unique_ptr<irl::IrlSegment> Break::code_gen(irl::Context context)
+{
+    if (!context.break_label)
+        throw std::logic_error("break called outside a loop");
+
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(context.break_label));
+
+    return segment;
+}

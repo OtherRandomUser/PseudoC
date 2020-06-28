@@ -290,7 +290,7 @@ TokenType get_keyword(const std::string& lexema)
     if (lexema == "case")
         return TokenType::CASE;
 
-    if (lexema == "breack")
+    if (lexema == "break")
         return TokenType::BREAK;
 
     if (lexema == "continue")

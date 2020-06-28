@@ -42,4 +42,11 @@ namespace ast
         std::string print() override;
         std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
     };
+
+    class Break : public Statement
+    {
+    public:
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
+    };
 }

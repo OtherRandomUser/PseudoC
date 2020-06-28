@@ -154,6 +154,17 @@ std::unique_ptr<ast::Statement> parse_continue_statement(Lexer& lexer)
     return std::make_unique<ast::Continue>();
 }
 
+std::unique_ptr<ast::Statement> parse_break_statement(Lexer& lexer)
+{
+    lexer.bump();
+    auto curr = lexer.bump();
+
+    if (curr.tk_type != ';')
+        throw std::logic_error("expected ';' but found '" + curr.lexema + "'");
+
+    return std::make_unique<ast::Break>();
+}
+
 std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 {
     auto curr = lexer.peek_current();
@@ -175,6 +186,9 @@ std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 
     if (curr.tk_type == TokenType::CONTINUE)
         return parse_continue_statement(lexer);
+
+    if (curr.tk_type == TokenType::BREAK)
+        return parse_break_statement(lexer);
 
     return parse_expression_statement(lexer);
 }

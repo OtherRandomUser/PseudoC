@@ -7,8 +7,8 @@ int main(int c)
         if (res > 2000)
             continue;
 
-        // if (res > 1500)
-        //     break;
+        if (res > 1500)
+            break;
 
         res *= c;
     }
