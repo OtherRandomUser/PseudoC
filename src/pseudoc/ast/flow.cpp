@@ -97,3 +97,60 @@ void IfStatement::set_variable_scope(std::shared_ptr<VariableScope> var_scope, s
     _var_scope = std::move(var_scope);
     _ftable = std::move(ftable);
 }
+
+WhileLoop::WhileLoop(std::unique_ptr<Expression> condition, std::unique_ptr<Statement> body):
+    _condition(std::move(condition)),
+    _body(std::move(body))
+{
+}
+
+std::string WhileLoop::print()
+{
+    return "while (" + _condition->print()
+        + ")\ndo " + _body->print();
+}
+
+std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen()
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    // prepare refs and code generation
+    auto ref_condition = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto condition = _condition->code_gen();
+
+    auto ref_body = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto body = _body->code_gen();
+
+    auto ref_end = _var_scope->new_temp(irl::LlvmAtomic::v);
+
+    // build code segment
+    segment->instructions.push_back(std::make_unique<irl::Jump>(ref_condition));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_condition));
+
+    for (auto& i: condition->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), ref_body, ref_end));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(ref_body)));
+
+    for (auto& i: body->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(std::move(ref_condition)));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(ref_end)));
+
+    return segment;
+}
+
+void WhileLoop::set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable)
+{
+    _condition->set_variable_scope(var_scope, ftable);
+    _body->set_variable_scope(var_scope, ftable);
+
+    _var_scope = std::move(var_scope);
+    _ftable = std::move(ftable);
+}

@@ -1,16 +1,18 @@
-int main(int argc)
+int main(int c)
 {
-    int a;
-    int b = 2;
-    int c = b;
-    a = (3 + b) / ++c;
+    int res = 0;
 
-    // int d = c > 0 && c != b || a;
+    // while (1)
+    while (res < 1500)
+    {
+        // if (res % 2)
+        //     continue;
 
-    if (c--)
-        a += c;
-    else
-        b -= 2;
+        // if (res > 1500)
+        //     break;
 
-    return a + b - 7;
+        res *= c;
+    }
+
+    return res;
 }

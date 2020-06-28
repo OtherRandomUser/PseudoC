@@ -118,20 +118,49 @@ std::unique_ptr<ast::Statement> parse_if_statement(Lexer& lexer)
     return std::make_unique<ast::IfStatement>(std::move(condition), std::move(on_true));
 }
 
+std::unique_ptr<ast::Statement> parse_while_loop(Lexer& lexer)
+{
+    lexer.bump();
+    auto curr = lexer.bump();
+
+    if (curr.tk_type != '(')
+        throw std::logic_error("expected '(' but found '" + curr.lexema + "'");
+
+    auto condition = parse_expression(lexer);
+
+    if (condition->get_type() != irl::LlvmAtomic::b)
+    {
+        condition = std::make_unique<ast::BooleanCast>(std::move(condition));
+    }
+
+    curr = lexer.bump();
+
+    if (curr.tk_type != ')')
+        throw std::logic_error("expected ')' but found '" + curr.lexema + "'");
+
+    auto body = parse_statement(lexer);
+
+    return std::make_unique<ast::WhileLoop>(std::move(condition), std::move(body));
+}
+
 std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 {
-    if (is_type(lexer.peek_current()))
+    auto curr = lexer.peek_current();
+
+    if (is_type(curr))
         return parse_declaration_statement(lexer);
 
-    if (lexer.peek_current().tk_type == '{')
+    if (curr.tk_type == '{')
         return parse_compound_statement(lexer);
 
-    if (lexer.peek_current().tk_type == TokenType::RETURN)
+    if (curr.tk_type == TokenType::RETURN)
         return parse_return_statement(lexer);
 
-    if (lexer.peek_current().tk_type == TokenType::IF)
+    if (curr.tk_type == TokenType::IF)
         return parse_if_statement(lexer);
 
-        
+    if (curr.tk_type == TokenType::WHILE)
+        return parse_while_loop(lexer);
+
     return parse_expression_statement(lexer);
 }
