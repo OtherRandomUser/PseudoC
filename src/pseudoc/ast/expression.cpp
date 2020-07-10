@@ -500,3 +500,67 @@ std::unique_ptr<irl::IrlSegment> BooleanCast::code_gen(irl::Context context)
     segment->out_value = std::move(ref);
     return segment;
 }
+
+ConditionalExpression::ConditionalExpression(std::unique_ptr<Expression> condition, std::unique_ptr<Expression> true_branch, std::unique_ptr<Expression> false_branch):
+    _condition(std::move(condition)),
+    _true_branch(std::move(true_branch)),
+    _false_branch(std::move(false_branch))
+{
+}
+
+std::string ConditionalExpression::print()
+{
+    return "( " + _condition->print() + " ? " + _true_branch->print() + " : " + _false_branch->print() + " )";
+}
+
+std::unique_ptr<irl::IrlSegment> ConditionalExpression::code_gen(irl::Context context)
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto condition = _condition->code_gen(context);
+
+    for (auto& i: condition->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    auto ref_true = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto true_branch = _true_branch->code_gen(context);
+
+    auto ref_false = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto false_branch = _false_branch->code_gen(std::move(context));
+
+    auto ref_end = _var_scope->new_temp(irl::LlvmAtomic::v);
+
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), ref_true, ref_false));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_true));
+
+    for (auto& i: true_branch->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(ref_end));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_false));
+
+    for (auto& i:false_branch->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(ref_end));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(ref_end)));
+
+    // TODO use node type
+    auto tp = irl::LlvmAtomic::i32;
+    auto out = _var_scope->new_temp(tp);
+
+    auto phi = std::make_unique<irl::Phi>(out, tp);
+    phi->add_branch(std::move(true_branch->out_value), std::move(ref_true));
+    phi->add_branch(std::move(false_branch->out_value), std::move(ref_false));
+
+    segment->instructions.push_back(std::move(phi));
+    segment->out_value = std::move(out);
+
+    return segment;
+}

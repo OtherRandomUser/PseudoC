@@ -8,42 +8,29 @@ define dso_local i32 @main(i32 %0) #0 {
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
   %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
   store i32 0, i32* %2, align 4
   store i32 %0, i32* %3, align 4
-  store i32 0, i32* %4, align 4
-  br label %5
+  store i32 12, i32* %4, align 4
+  %6 = load i32, i32* %3, align 4
+  %7 = icmp sgt i32 %6, 9
+  br i1 %7, label %8, label %11
 
-5:                                                ; preds = %16, %11, %1
-  %6 = load i32, i32* %4, align 4
-  %7 = icmp slt i32 %6, 1500
-  br i1 %7, label %8, label %20
-
-8:                                                ; preds = %5
+8:                                                ; preds = %1
   %9 = load i32, i32* %4, align 4
-  %10 = icmp sgt i32 %9, 2000
-  br i1 %10, label %11, label %12
+  %10 = add nsw i32 4000, %9
+  br label %14
 
-11:                                               ; preds = %8
-  br label %5
+11:                                               ; preds = %1
+  %12 = load i32, i32* %4, align 4
+  %13 = sub nsw i32 12, %12
+  br label %14
 
-12:                                               ; preds = %8
-  %13 = load i32, i32* %4, align 4
-  %14 = icmp sgt i32 %13, 1500
-  br i1 %14, label %15, label %16
-
-15:                                               ; preds = %12
-  br label %20
-
-16:                                               ; preds = %12
-  %17 = load i32, i32* %3, align 4
-  %18 = load i32, i32* %4, align 4
-  %19 = mul nsw i32 %18, %17
-  store i32 %19, i32* %4, align 4
-  br label %5
-
-20:                                               ; preds = %15, %5
-  %21 = load i32, i32* %4, align 4
-  ret i32 %21
+14:                                               ; preds = %11, %8
+  %15 = phi i32 [ %10, %8 ], [ %13, %11 ]
+  store i32 %15, i32* %5, align 4
+  %16 = load i32, i32* %4, align 4
+  ret i32 %16
 }
 
 attributes #0 = { noinline nounwind optnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "frame-pointer"="all" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }

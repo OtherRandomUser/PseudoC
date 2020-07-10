@@ -231,4 +231,28 @@ namespace ast
     private:
         std::unique_ptr<Expression> _inner;
     };
+
+    class ConditionalExpression : public Expression
+    {
+    public:
+        ConditionalExpression(std::unique_ptr<Expression> condition, std::unique_ptr<Expression> true_branch, std::unique_ptr<Expression> false_branch);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            _condition->set_variable_scope(var_scope, ftable);
+            _true_branch->set_variable_scope(var_scope, ftable);
+            _false_branch->set_variable_scope(var_scope, ftable);
+
+            _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
+        }
+
+    private:
+        std::unique_ptr<Expression> _condition;
+        std::unique_ptr<Expression> _true_branch;
+        std::unique_ptr<Expression> _false_branch;
+    };
 }

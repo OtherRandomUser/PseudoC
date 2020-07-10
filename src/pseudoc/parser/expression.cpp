@@ -83,6 +83,8 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
 
     if (curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == '?'
+        || curr.tk_type == ':'
         || curr.tk_type == TokenType::EQUALS
         || curr.tk_type == TokenType::NOT_EQUAL
         || curr.tk_type == '<'
@@ -128,6 +130,8 @@ std::unique_ptr<ast::Expression> parse_additive_expression_r(Lexer& lexer, std::
     if (auto curr = lexer.peek_current();
         curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == '?'
+        || curr.tk_type == ':'
         || curr.tk_type == TokenType::EQUALS
         || curr.tk_type == TokenType::NOT_EQUAL
         || curr.tk_type == '<'
@@ -204,7 +208,11 @@ std::unique_ptr<ast::Expression> parse_equality_expression_r(Lexer& lexer, std::
         return parse_equality_expression_r(lexer, std::move(expr));
     }
 
-    if (auto curr = lexer.peek_current(); curr.tk_type == ';' || curr.tk_type == ')')
+    if (auto curr = lexer.peek_current();
+        curr.tk_type == ';'
+        || curr.tk_type == ')'
+        || curr.tk_type == '?'
+        || curr.tk_type == ':')
     {
         return lhs;
     }
@@ -217,6 +225,35 @@ std::unique_ptr<ast::Expression> parse_equality_expression(Lexer& lexer)
 {
     auto lhs = parse_additive_expression(lexer);
     return parse_equality_expression_r(lexer, std::move(lhs));
+}
+
+std::unique_ptr<ast::Expression> parse_conditional_expression(Lexer& lexer)
+{
+    auto condition = parse_equality_expression(lexer);
+    
+    auto curr = lexer.peek_current();
+
+    if (curr.tk_type == '?')
+    {
+        lexer.bump();
+        auto true_branch = parse_conditional_expression(lexer);
+
+        curr = lexer.bump();
+
+        if (curr.tk_type != ':')
+            throw std::logic_error("expected : but found " + curr.lexema);
+
+        auto false_branch = parse_conditional_expression(lexer);
+
+        return std::make_unique<ast::ConditionalExpression>(std::move(condition), std::move(true_branch), std::move(false_branch));
+    }
+
+    if (curr.tk_type == ';' || curr.tk_type == ')' || curr.tk_type == '?' || curr.tk_type == ':')
+    {
+        return condition;
+    }
+
+    throw std::logic_error("parse error on parse_conditional_expression " + curr.lexema);
 }
 
 std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
@@ -232,7 +269,7 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 
         lexer.bump();
 
-        auto rhs = parse_additive_expression(lexer);
+        auto rhs = parse_conditional_expression(lexer);
 
         return std::make_unique<ast::RegularAssignment>(std::move(curr.lexema), std::move(rhs));
     }
@@ -248,7 +285,7 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 
         lexer.bump();
 
-        auto rhs = parse_additive_expression(lexer);
+        auto rhs = parse_conditional_expression(lexer);
         rhs = std::make_unique<ast::Addition>(std::move(var_ref), std::move(rhs));
 
         return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
@@ -265,7 +302,7 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 
         lexer.bump();
 
-        auto rhs = parse_additive_expression(lexer);
+        auto rhs = parse_conditional_expression(lexer);
         rhs = std::make_unique<ast::Subtraction>(std::move(var_ref), std::move(rhs));
 
         return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
@@ -282,7 +319,7 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 
         lexer.bump();
 
-        auto rhs = parse_additive_expression(lexer);
+        auto rhs = parse_conditional_expression(lexer);
         rhs = std::make_unique<ast::Multiplication>(std::move(var_ref), std::move(rhs));
 
         return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
@@ -299,13 +336,13 @@ std::unique_ptr<ast::Expression> parse_assignment_expression(Lexer& lexer)
 
         lexer.bump();
 
-        auto rhs = parse_additive_expression(lexer);
+        auto rhs = parse_conditional_expression(lexer);
         rhs = std::make_unique<ast::Division>(std::move(var_ref), std::move(rhs));
 
         return std::make_unique<ast::RegularAssignment>(std::move(variable.lexema), std::move(rhs));
     }
 
-    return parse_equality_expression(lexer);
+    return parse_conditional_expression(lexer);
 }
 
 std::unique_ptr<ast::Expression> parse_expression(Lexer& lexer)

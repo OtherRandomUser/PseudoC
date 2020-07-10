@@ -205,4 +205,37 @@ namespace irl
         std::shared_ptr<Value> _rhs;
         LlvmAtomic _tp;
     };
+
+    class Phi : public Instruction
+    {
+    public:
+        Phi(std::shared_ptr<Variable> out, LlvmAtomic tp);
+
+        struct Node
+        {
+            std::shared_ptr<Value> val;
+            std::shared_ptr<Variable> origin;
+        };
+
+        void add_branch(std::shared_ptr<Value> val, std::shared_ptr<Variable> origin);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Variable> _out;
+        std::vector<Node> _branches;
+        LlvmAtomic _tp;
+    };
+
+    class ZExt : public Instruction
+    {
+    public:
+        ZExt(std::shared_ptr<Value> in, LlvmAtomic tp1, std::shared_ptr<Variable> out, LlvmAtomic tp2);
+
+        std::string print() override;
+
+    private:
+        std::shared_ptr<Value> _in;
+        std::shared_ptr<Variable> _out;
+    };
 }

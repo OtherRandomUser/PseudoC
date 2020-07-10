@@ -277,3 +277,53 @@ std::string ICmp::print()
         + _lhs->print() + ", "
         + _rhs->print() + "\n";
 }
+
+Phi::Phi(std::shared_ptr<Variable> out, LlvmAtomic tp):
+    _out(std::move(out))
+{
+    _tp = tp;
+}
+
+void Phi::add_branch(std::shared_ptr<Value> val, std::shared_ptr<Variable> origin)
+{
+    if (val->tp != _tp)
+        throw std::logic_error("Incompatible types");
+
+    _branches.push_back({
+        .val = std::move(val),
+        .origin = std::move(origin)
+    });
+}
+
+std::string Phi::print()
+{
+    if (_branches.size() < 2)
+        throw std::logic_error("Phi command used with less than two operrands");
+
+    std::string res = _out->print() + " = phi " + atomic_to_string(_tp);
+    std::string junc = "";
+
+    for (const auto& branch: _branches)
+    {
+        res += junc + " [ " + branch.val->print() + ", " + branch.origin->print() + " ]";
+        junc = ",";
+    }
+
+    res += '\n';
+    return res;
+}
+
+ZExt::ZExt(std::shared_ptr<Value> in, LlvmAtomic tp1, std::shared_ptr<Variable> out, LlvmAtomic tp2):
+    _in(std::move(in)),
+    _out(std::move(out))
+{
+}
+
+std::string ZExt::print()
+{
+    // %31 = zext i1 %30 to i32
+    return _out->print() + " = "
+        + atomic_to_string(_in->tp) + " "
+        + _in->print() + " to "
+        + atomic_to_string(_out->tp) + "\n";
+}
