@@ -24,7 +24,6 @@ int main(int argc, char **argv)
 
     std::string src((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
     Lexer lexer(src);
-    auto scope = std::make_shared<VariableScope>();
     auto ftable = std::make_shared<FunctionTable>();
 
     irl::Context base_context;
@@ -34,6 +33,7 @@ int main(int argc, char **argv)
     while (!lexer.is_eof())
     {
         auto ast = parse_definition(lexer);
+        auto scope = std::make_shared<VariableScope>();
 
         std::cout << "Definition:" << std::endl;
         std::cout << ast->print() << std::endl << std::endl;

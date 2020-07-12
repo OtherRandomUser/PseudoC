@@ -4,32 +4,44 @@ target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16
 target triple = "x86_64-pc-linux-gnu"
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define dso_local i32 @main(i32 %0) #0 {
+define dso_local i32 @main() #0 {
+  %1 = alloca i32, align 4
   %2 = alloca i32, align 4
-  %3 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  store i32 12, i32* %2, align 4
+  %3 = load i32, i32* %2, align 4
+  ret i32 %3
+}
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @func(i32 %0, i32 %1, i32 %2) #0 {
   %4 = alloca i32, align 4
   %5 = alloca i32, align 4
-  store i32 0, i32* %2, align 4
-  store i32 %0, i32* %3, align 4
-  store i32 12, i32* %4, align 4
-  %6 = load i32, i32* %3, align 4
-  %7 = icmp sgt i32 %6, 9
-  br i1 %7, label %8, label %11
+  %6 = alloca i32, align 4
+  %7 = alloca i32, align 4
+  store i32 %0, i32* %4, align 4
+  store i32 %1, i32* %5, align 4
+  store i32 %2, i32* %6, align 4
+  store i32 0, i32* %7, align 4
+  %8 = load i32, i32* %5, align 4
+  %9 = icmp sgt i32 %8, 0
+  br i1 %9, label %10, label %14
 
-8:                                                ; preds = %1
-  %9 = load i32, i32* %4, align 4
-  %10 = add nsw i32 4000, %9
-  br label %14
+10:                                               ; preds = %3
+  %11 = load i32, i32* %6, align 4
+  %12 = icmp slt i32 %11, 0
+  br i1 %12, label %13, label %14
 
-11:                                               ; preds = %1
-  %12 = load i32, i32* %4, align 4
-  %13 = sub nsw i32 12, %12
-  br label %14
+13:                                               ; preds = %10
+  store i32 1, i32* %7, align 4
+  br label %15
 
-14:                                               ; preds = %11, %8
-  %15 = phi i32 [ %10, %8 ], [ %13, %11 ]
-  store i32 %15, i32* %5, align 4
-  %16 = load i32, i32* %4, align 4
+14:                                               ; preds = %10, %3
+  store i32 2, i32* %7, align 4
+  br label %15
+
+15:                                               ; preds = %14, %13
+  %16 = load i32, i32* %7, align 4
   ret i32 %16
 }
 

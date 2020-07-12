@@ -85,6 +85,8 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
         || curr.tk_type == ')'
         || curr.tk_type == '?'
         || curr.tk_type == ':'
+        || curr.tk_type == TokenType::LOGICAL_OR
+        || curr.tk_type == TokenType::LOGICAL_AND
         || curr.tk_type == TokenType::EQUALS
         || curr.tk_type == TokenType::NOT_EQUAL
         || curr.tk_type == '<'
@@ -132,6 +134,8 @@ std::unique_ptr<ast::Expression> parse_additive_expression_r(Lexer& lexer, std::
         || curr.tk_type == ')'
         || curr.tk_type == '?'
         || curr.tk_type == ':'
+        || curr.tk_type == TokenType::LOGICAL_OR
+        || curr.tk_type == TokenType::LOGICAL_AND
         || curr.tk_type == TokenType::EQUALS
         || curr.tk_type == TokenType::NOT_EQUAL
         || curr.tk_type == '<'
@@ -212,13 +216,15 @@ std::unique_ptr<ast::Expression> parse_equality_expression_r(Lexer& lexer, std::
         curr.tk_type == ';'
         || curr.tk_type == ')'
         || curr.tk_type == '?'
-        || curr.tk_type == ':')
+        || curr.tk_type == ':'
+        || curr.tk_type == TokenType::LOGICAL_OR
+        || curr.tk_type == TokenType::LOGICAL_AND)
     {
         return lhs;
     }
 
     // TODO better error handling
-    throw std::logic_error("parse error on parse_additive_expression_r");
+    throw std::logic_error("parse error on parse_equality_expression_r");
 }
 
 std::unique_ptr<ast::Expression> parse_equality_expression(Lexer& lexer)
@@ -227,9 +233,86 @@ std::unique_ptr<ast::Expression> parse_equality_expression(Lexer& lexer)
     return parse_equality_expression_r(lexer, std::move(lhs));
 }
 
+// TODO fix up
+
+std::unique_ptr<ast::Expression> parse_logical_and_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
+{
+    if (lexer.peek_current().tk_type == TokenType::LOGICAL_AND)
+    {
+        lexer.bump();
+        auto rhs = parse_equality_expression(lexer);
+
+        if (lhs->get_type() != irl::LlvmAtomic::b)
+            lhs = std::make_unique<ast::BooleanCast>(std::move(lhs));
+
+        if (rhs->get_type() != irl::LlvmAtomic::b)
+            rhs = std::make_unique<ast::BooleanCast>(std::move(rhs));
+
+        auto expr = std::make_unique<ast::LogicalAnd>(std::move(lhs), std::move(rhs));
+
+        return parse_logical_and_expression_r(lexer, std::move(expr));
+    }
+
+    if (auto curr = lexer.peek_current();
+        curr.tk_type == ';'
+        || curr.tk_type == ')'
+        || curr.tk_type == '?'
+        || curr.tk_type == ':'
+        || curr.tk_type == TokenType::LOGICAL_OR)
+    {
+        return lhs;
+    }
+
+    // TODO better error handling
+    throw std::logic_error("parse error on parse_logical_and_expression_r");
+}
+
+std::unique_ptr<ast::Expression> parse_logical_and_expression(Lexer& lexer)
+{
+    auto lhs = parse_equality_expression(lexer);
+    return parse_logical_and_expression_r(lexer, std::move(lhs));
+}
+
+std::unique_ptr<ast::Expression> parse_logical_or_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
+{
+    if (lexer.peek_current().tk_type == TokenType::LOGICAL_OR)
+    {
+        lexer.bump();
+        auto rhs = parse_logical_and_expression(lexer);
+
+        if (lhs->get_type() != irl::LlvmAtomic::b)
+            lhs = std::make_unique<ast::BooleanCast>(std::move(lhs));
+
+        if (rhs->get_type() != irl::LlvmAtomic::b)
+            rhs = std::make_unique<ast::BooleanCast>(std::move(rhs));
+
+        auto expr = std::make_unique<ast::LogicalAnd>(std::move(lhs), std::move(rhs));
+
+        return parse_logical_or_expression_r(lexer, std::move(expr));
+    }
+
+    if (auto curr = lexer.peek_current();
+        curr.tk_type == ';'
+        || curr.tk_type == ')'
+        || curr.tk_type == '?'
+        || curr.tk_type == ':')
+    {
+        return lhs;
+    }
+
+    // TODO better error handling
+    throw std::logic_error("parse error on parse_logical_or_expression_r");
+}
+
+std::unique_ptr<ast::Expression> parse_logical_or_expression(Lexer& lexer)
+{
+    auto lhs = parse_equality_expression(lexer);
+    return parse_logical_and_expression_r(lexer, std::move(lhs));
+}
+
 std::unique_ptr<ast::Expression> parse_conditional_expression(Lexer& lexer)
 {
-    auto condition = parse_equality_expression(lexer);
+    auto condition = parse_logical_or_expression(lexer);
     
     auto curr = lexer.peek_current();
 

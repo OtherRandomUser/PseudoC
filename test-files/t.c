@@ -1,18 +1,20 @@
-int main(int c)
+int main()
 {
     int res = 12;
-    int a = c > 9 ? 4000 + res : 12 - res;
 
-    // while (res < a)
-    // {
-    //     if (res > 2000)
-    //         continue;
+    return res;
+}
 
-    //     if (res > 1500)
-    //         break;
+int func(int c, int a, int b)
+{
+    // int res = a > 0 && b < 0;
 
-    //     res *= c;
-    // }
+    int res = 0;
+
+    if (a > 0 && b < 0)
+        res = 1;
+    else
+        res = 2;
 
     return res;
 }

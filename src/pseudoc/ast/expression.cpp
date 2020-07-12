@@ -376,6 +376,7 @@ std::unique_ptr<irl::IrlSegment> Compare::code_gen(irl::Context context)
 LogicalAnd::LogicalAnd(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
     BinaryOp(std::move(lhs), std::move(rhs))
 {
+    _tp = irl::LlvmAtomic::b;
 }
 
 std::string LogicalAnd::print()
@@ -388,18 +389,35 @@ std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen(irl::Context context)
     auto segment = std::make_unique<irl::IrlSegment>();
 
     auto lhs = _lhs->code_gen(context);
+
+    auto ref_rhs = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto rhs = _rhs->code_gen(context);
+
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen(std::move(context));
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(lhs->out_value, ref_rhs, context.ph_false));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_rhs));
+
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    // TODO solve this headache
+    if (context.ph_true == context.ph_false)
+        segment->instructions.push_back(std::make_unique<irl::Jump>(context.ph_true));
+    else
+        segment->instructions.push_back(std::make_unique<irl::JumpC>(rhs->out_value, context.ph_true, context.ph_false));
+
+    auto out_false = std::make_unique<irl::IntLiteral>();
+
+    out_false->tp = irl::LlvmAtomic::b;
+    out_false->value = 0;
+
+    segment->out_value = rhs->out_value;
+    segment->out_false = std::move(out_false);
 
     return segment;
 }
@@ -407,11 +425,12 @@ std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen(irl::Context context)
 LogicalOr::LogicalOr(std::unique_ptr<Expression> lhs, std::unique_ptr<Expression> rhs):
     BinaryOp(std::move(lhs), std::move(rhs))
 {
+    _tp = irl::LlvmAtomic::b;
 }
 
 std::string LogicalOr::print()
 {
-    return "( " + _lhs->print() + " and " + _rhs->print() + " )";
+    return "( " + _lhs->print() + " or " + _rhs->print() + " )";
 }
 
 std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen(irl::Context context)
@@ -419,18 +438,35 @@ std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen(irl::Context context)
     auto segment = std::make_unique<irl::IrlSegment>();
 
     auto lhs = _lhs->code_gen(context);
+
+    auto ref_rhs = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto rhs = _rhs->code_gen(context);
+
     for (auto& i: lhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    auto rhs = _rhs->code_gen(std::move(context));
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(lhs->out_value, context.ph_true, ref_rhs));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_rhs));
+
     for (auto& i: rhs->instructions)
     {
         segment->instructions.push_back(std::move(i));
     }
 
-    // TODO solve this headache
+    if (context.ph_true == context.ph_false)
+        segment->instructions.push_back(std::make_unique<irl::Jump>(context.ph_true));
+    else
+        segment->instructions.push_back(std::make_unique<irl::JumpC>(rhs->out_value, context.ph_true, context.ph_false));
+
+    auto out_false = std::make_unique<irl::IntLiteral>();
+
+    out_false->tp = irl::LlvmAtomic::b;
+    out_false->value = 1;
+
+    segment->out_value = rhs->out_value;
+    segment->out_false = std::move(out_false);
 
     return segment;
 }

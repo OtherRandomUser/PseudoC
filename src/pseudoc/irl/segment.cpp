@@ -1,4 +1,5 @@
 #include <pseudoc/irl/segment.hpp>
+#include <iostream>
 
 using namespace irl;
 
@@ -8,7 +9,8 @@ std::string IrlSegment::print()
 
     for (auto& instruction: instructions)
     {
-        res += instruction->print();
+        // res += instruction->print();
+        std::cout << instruction->print();
     }
 
     return res;

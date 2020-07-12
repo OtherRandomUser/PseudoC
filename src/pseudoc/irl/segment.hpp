@@ -12,6 +12,7 @@ namespace irl
     {
         std::vector<std::unique_ptr<Instruction>> instructions;
         std::shared_ptr<Value> out_value;
+        std::shared_ptr<Value> out_false;
 
         std::string print();
     };
@@ -20,5 +21,8 @@ namespace irl
     {
         std::shared_ptr<Variable> continue_label;
         std::shared_ptr<Variable> break_label;
+
+        std::shared_ptr<Placeholder> ph_true = nullptr;
+        std::shared_ptr<Placeholder> ph_false = nullptr;
     };
 }
