@@ -406,11 +406,6 @@ std::unique_ptr<irl::IrlSegment> LogicalAnd::code_gen(irl::Context context)
         segment->instructions.push_back(std::move(i));
     }
 
-    if (context.ph_true == context.ph_false)
-        segment->instructions.push_back(std::make_unique<irl::Jump>(context.ph_true));
-    else
-        segment->instructions.push_back(std::make_unique<irl::JumpC>(rhs->out_value, context.ph_true, context.ph_false));
-
     auto out_false = std::make_unique<irl::IntLiteral>();
 
     out_false->tp = irl::LlvmAtomic::b;
@@ -436,10 +431,13 @@ std::string LogicalOr::print()
 std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
+    auto ref_rhs = _var_scope->new_placeholder(irl::LlvmAtomic::v);
 
-    auto lhs = _lhs->code_gen(context);
+    irl::Context lhs_context = context;
+    lhs_context.ph_false = ref_rhs;
 
-    auto ref_rhs = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto lhs = _lhs->code_gen(lhs_context);
+    _var_scope->fix_placehoder(ref_rhs);
     auto rhs = _rhs->code_gen(context);
 
     for (auto& i: lhs->instructions)
@@ -454,11 +452,6 @@ std::unique_ptr<irl::IrlSegment> LogicalOr::code_gen(irl::Context context)
     {
         segment->instructions.push_back(std::move(i));
     }
-
-    if (context.ph_true == context.ph_false)
-        segment->instructions.push_back(std::make_unique<irl::Jump>(context.ph_true));
-    else
-        segment->instructions.push_back(std::make_unique<irl::JumpC>(rhs->out_value, context.ph_true, context.ph_false));
 
     auto out_false = std::make_unique<irl::IntLiteral>();
 

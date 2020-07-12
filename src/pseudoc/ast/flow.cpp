@@ -40,22 +40,16 @@ std::unique_ptr<irl::IrlSegment> IfStatement::code_gen(irl::Context context)
         segment->instructions.push_back(std::move(i));
     }
 
-    bool add_jump = segment->out_false != nullptr;
-
-    // auto ref_true = _var_scope->new_temp(irl::LlvmAtomic::v);
     _var_scope->fix_placehoder(context.ph_true);
     auto on_true = _on_true->code_gen(context);
 
-    // auto ref_false = _var_scope->new_temp(irl::LlvmAtomic::v);
     _var_scope->fix_placehoder(context.ph_false);
 
     if (!_on_false)
     {
         auto label_end = std::make_unique<irl::Label>(context.ph_false);
 
-        if (add_jump)
-            segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_false, context.ph_false));
-
+        segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_false, context.ph_false));
         segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_true)));
 
         for (auto& i: on_true->instructions)
@@ -73,9 +67,7 @@ std::unique_ptr<irl::IrlSegment> IfStatement::code_gen(irl::Context context)
 
     auto ref_end = _var_scope->new_temp(irl::LlvmAtomic::v);
 
-    if (add_jump)
-        segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_true, context.ph_false));
-
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_true, context.ph_false));
     segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_true)));
 
     for (auto& i: on_true->instructions)
@@ -125,20 +117,23 @@ std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen(irl::Context context)
 {
     auto segment = std::make_unique<irl::IrlSegment>();
 
+    context.ph_true = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+    context.ph_false = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+
     // prepare refs and code generation
     auto ref_condition = _var_scope->new_temp(irl::LlvmAtomic::v);
     auto condition = _condition->code_gen(context);
 
-    auto ref_end = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+    // auto ref_end = _var_scope->new_placeholder(irl::LlvmAtomic::v);
 
     irl::Context lcontext;
-    lcontext.break_label = ref_end;
+    lcontext.break_label = context.ph_false;
     lcontext.continue_label = ref_condition;
 
-    auto ref_body = _var_scope->new_temp(irl::LlvmAtomic::v);
+    _var_scope->fix_placehoder(context.ph_true);
     auto body = _body->code_gen(lcontext);
 
-    _var_scope->fix_placehoder(ref_end);
+    _var_scope->fix_placehoder(context.ph_false);
 
     // build code segment
     segment->instructions.push_back(std::make_unique<irl::Jump>(ref_condition));
@@ -149,8 +144,8 @@ std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen(irl::Context context)
         segment->instructions.push_back(std::move(i));
     }
 
-    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), ref_body, ref_end));
-    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(ref_body)));
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_true, context.ph_false));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_true)));
 
     for (auto& i: body->instructions)
     {
@@ -158,7 +153,7 @@ std::unique_ptr<irl::IrlSegment> WhileLoop::code_gen(irl::Context context)
     }
 
     segment->instructions.push_back(std::make_unique<irl::Jump>(std::move(ref_condition)));
-    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(ref_end)));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_false)));
 
     return segment;
 }

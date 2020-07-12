@@ -198,16 +198,16 @@ std::unique_ptr<ast::Expression> parse_equality_expression_r(Lexer& lexer, std::
     {
         lexer.bump();
         auto rhs = parse_additive_expression(lexer);
-        auto expr = std::make_unique<ast::Compare>(ast::Compare::Code::LT, std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Compare>(ast::Compare::Code::GT, std::move(lhs), std::move(rhs));
 
         return parse_equality_expression_r(lexer, std::move(expr));
     }
 
-    if (lexer.peek_current().tk_type == TokenType::LESS_THAN)
+    if (lexer.peek_current().tk_type == TokenType::MORE_THAN)
     {
         lexer.bump();
         auto rhs = parse_additive_expression(lexer);
-        auto expr = std::make_unique<ast::Compare>(ast::Compare::Code::LE, std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::Compare>(ast::Compare::Code::GE, std::move(lhs), std::move(rhs));
 
         return parse_equality_expression_r(lexer, std::move(expr));
     }
@@ -286,7 +286,7 @@ std::unique_ptr<ast::Expression> parse_logical_or_expression_r(Lexer& lexer, std
         if (rhs->get_type() != irl::LlvmAtomic::b)
             rhs = std::make_unique<ast::BooleanCast>(std::move(rhs));
 
-        auto expr = std::make_unique<ast::LogicalAnd>(std::move(lhs), std::move(rhs));
+        auto expr = std::make_unique<ast::LogicalOr>(std::move(lhs), std::move(rhs));
 
         return parse_logical_or_expression_r(lexer, std::move(expr));
     }
@@ -306,8 +306,8 @@ std::unique_ptr<ast::Expression> parse_logical_or_expression_r(Lexer& lexer, std
 
 std::unique_ptr<ast::Expression> parse_logical_or_expression(Lexer& lexer)
 {
-    auto lhs = parse_equality_expression(lexer);
-    return parse_logical_and_expression_r(lexer, std::move(lhs));
+    auto lhs = parse_logical_and_expression(lexer);
+    return parse_logical_or_expression_r(lexer, std::move(lhs));
 }
 
 std::unique_ptr<ast::Expression> parse_conditional_expression(Lexer& lexer)

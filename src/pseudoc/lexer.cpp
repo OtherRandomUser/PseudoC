@@ -399,13 +399,13 @@ Token Lexer::_create_ascii_token(char c, char d)
     if (c == '&' && d == '&')
     {
         tp = TokenType::LOGICAL_AND;
-        lexema = "==";
+        lexema = "&&";
     }
 
     if (c == '|' && d == '|')
     {
         tp = TokenType::LOGICAL_OR;
-        lexema = "==";
+        lexema = "||";
     }
 
     return {
