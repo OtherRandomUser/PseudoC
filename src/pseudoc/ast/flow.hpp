@@ -36,6 +36,23 @@ namespace ast
         std::unique_ptr<Statement> _body;
     };
 
+    class ForLoop : public Statement
+    {
+    public:
+        ForLoop(std::unique_ptr<Statement> initializer, std::unique_ptr<Expression> condition, std::unique_ptr<Expression> increment, std::unique_ptr<Statement> body);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override;
+
+    private:
+        std::unique_ptr<Statement> _initializer;
+        std::unique_ptr<Expression> _condition;
+        std::unique_ptr<Expression> _increment;
+        std::unique_ptr<Statement> _body;
+    };
+
     class Continue : public Statement
     {
     public:

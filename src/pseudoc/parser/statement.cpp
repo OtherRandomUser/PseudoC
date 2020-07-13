@@ -143,6 +143,42 @@ std::unique_ptr<ast::Statement> parse_while_loop(Lexer& lexer)
     return std::make_unique<ast::WhileLoop>(std::move(condition), std::move(body));
 }
 
+std::unique_ptr<ast::Statement> parse_for_loop(Lexer& lexer)
+{
+    lexer.bump();
+    auto curr = lexer.bump();
+
+    if (curr.tk_type != '(')
+        throw std::logic_error("expected '(' but found '" + curr.lexema + "'");
+
+    
+    curr = lexer.peek_current();
+
+    auto initializer = is_type(curr) ? parse_declaration_statement(lexer) : parse_expression_statement(lexer);
+    auto condition = parse_expression(lexer);
+
+    curr = lexer.bump();
+
+    if (curr.tk_type != ';')
+        throw std::logic_error("Expected ; but found " + curr.lexema);
+
+    if (condition->get_type() != irl::LlvmAtomic::b)
+    {
+        condition = std::make_unique<ast::BooleanCast>(std::move(condition));
+    }
+
+    auto increment = parse_expression(lexer);
+
+    curr = lexer.bump();
+
+    if (curr.tk_type != ')')
+        throw std::logic_error("expected ')' but found '" + curr.lexema + "'");
+
+    auto body = parse_statement(lexer);
+
+    return std::make_unique<ast::ForLoop>(std::move(initializer), std::move(condition), std::move(increment), std::move(body));
+}
+
 std::unique_ptr<ast::Statement> parse_continue_statement(Lexer& lexer)
 {
     lexer.bump();
@@ -183,6 +219,9 @@ std::unique_ptr<ast::Statement> parse_statement(Lexer& lexer)
 
     if (curr.tk_type == TokenType::WHILE)
         return parse_while_loop(lexer);
+
+    if (curr.tk_type == TokenType::FOR)
+        return parse_for_loop(lexer);
 
     if (curr.tk_type == TokenType::CONTINUE)
         return parse_continue_statement(lexer);

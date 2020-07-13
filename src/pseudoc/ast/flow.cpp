@@ -167,6 +167,90 @@ void WhileLoop::set_variable_scope(std::shared_ptr<VariableScope> var_scope, std
     _ftable = std::move(ftable);
 }
 
+ForLoop::ForLoop(std::unique_ptr<Statement> initializer, std::unique_ptr<Expression> condition, std::unique_ptr<Expression> increment, std::unique_ptr<Statement> body):
+    _initializer(std::move(initializer)),
+    _condition(std::move(condition)),
+    _increment(std::move(increment)),
+    _body(std::move(body))
+{
+}
+
+std::string ForLoop::print()
+{
+    return "for (" + _initializer->print() + " ; " + _condition->print() + " ; " + _increment->print()
+        + ")\ndo " + _body->print();
+}
+
+void ForLoop::set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable)
+{
+    _initializer->set_variable_scope(var_scope, ftable);
+    _condition->set_variable_scope(var_scope, ftable);
+    _increment->set_variable_scope(var_scope, ftable);
+    _body->set_variable_scope(var_scope, ftable);
+
+    _var_scope = std::move(var_scope);
+    _ftable = std::move(ftable);
+}
+ 
+std::unique_ptr<irl::IrlSegment> ForLoop::code_gen(irl::Context context)
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    context.ph_true = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+    context.ph_false = _var_scope->new_placeholder(irl::LlvmAtomic::v);
+
+    // prepare refs and code generation
+    auto initializer = _initializer->code_gen(context);
+    auto ref_condition = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto condition = _condition->code_gen(context);
+
+    irl::Context lcontext;
+    lcontext.break_label = context.ph_false;
+    lcontext.continue_label = ref_condition;
+
+    _var_scope->fix_placehoder(context.ph_true);
+    auto body = _body->code_gen(lcontext);
+    auto ref_increment = _var_scope->new_temp(irl::LlvmAtomic::v);
+    auto increment = _increment->code_gen(context);
+
+    _var_scope->fix_placehoder(context.ph_false);
+
+    // build code segment
+    for (auto& i: initializer->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(ref_condition));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_condition));
+
+    for (auto& i: condition->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::JumpC>(std::move(condition->out_value), context.ph_true, context.ph_false));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_true)));
+
+    for (auto& i: body->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(ref_increment));
+    segment->instructions.push_back(std::make_unique<irl::Label>(ref_increment));
+
+    for (auto& i: increment->instructions)
+    {
+        segment->instructions.push_back(std::move(i));
+    }
+
+    segment->instructions.push_back(std::make_unique<irl::Jump>(std::move(ref_condition)));
+    segment->instructions.push_back(std::make_unique<irl::Label>(std::move(context.ph_false)));
+
+    return segment;
+}
+
 std::string Continue::print()
 {
     return "continue\n";
