@@ -255,4 +255,28 @@ namespace ast
         std::unique_ptr<Expression> _true_branch;
         std::unique_ptr<Expression> _false_branch;
     };
+
+    class FCall : public Expression
+    {
+    public:
+        FCall(std::string id, std::vector<std::unique_ptr<Expression>> params);
+
+        std::string print() override;
+        std::unique_ptr<irl::IrlSegment> code_gen(irl::Context context) override;
+
+        void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
+        {
+            for (auto& param: _params)
+            {
+                param->set_variable_scope(var_scope, ftable);
+            }
+
+            _var_scope = std::move(var_scope);
+            _ftable = std::move(ftable);
+        }
+
+    private:
+        std::string _id;
+        std::vector<std::unique_ptr<Expression>> _params;
+    };
 }

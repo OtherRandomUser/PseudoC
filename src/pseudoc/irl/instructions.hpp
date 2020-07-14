@@ -238,4 +238,20 @@ namespace irl
         std::shared_ptr<Value> _in;
         std::shared_ptr<Variable> _out;
     };
+
+    class Call : public Instruction
+    {
+    public:
+        Call(std::string id, std::shared_ptr<Variable> out, LlvmAtomic tp);
+
+        void add_param(std::shared_ptr<Value> param);
+
+        std::string print() override;
+    
+    private:
+        std::string _id;
+        std::shared_ptr<Variable> _out;
+        std::vector<std::shared_ptr<Value>> _params;
+        LlvmAtomic _tp;
+    };
 }

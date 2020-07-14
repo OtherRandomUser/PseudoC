@@ -27,6 +27,51 @@ std::unique_ptr<ast::Expression> parse_primary_expression(Lexer& lexer)
     throw std::logic_error("expected primary expression but found " + curr.lexema);
 }
 
+std::vector<std::unique_ptr<ast::Expression>> parse_function_params(Lexer& lexer)
+{
+    auto curr = lexer.peek_current();
+    std::vector<std::unique_ptr<ast::Expression>> params;
+
+    if (curr.tk_type == ')')
+    {
+        lexer.bump();
+        return params;
+    }
+
+    while (true)
+    {
+        params.push_back(parse_expression(lexer));
+        
+        curr = lexer.bump();
+
+        if (curr.tk_type == ')')
+            break;
+
+        if (curr.tk_type != ',')
+            throw std::logic_error("expected ')', or ',' but found '" + curr.lexema + "'");
+    }
+
+    return params;
+}
+
+std::unique_ptr<ast::Expression> parse_function_call_expression(Lexer& lexer)
+{
+    auto curr = lexer.peek_current();
+    auto next = lexer.peek_next();
+
+    if (curr.tk_type == TokenType::IDENTIFIER && next.tk_type == '(')
+    {
+        lexer.bump();
+        lexer.bump();
+
+        auto params = parse_function_params(lexer);
+
+        return std::make_unique<ast::FCall>(curr.lexema, std::move(params));
+    }
+
+    return parse_primary_expression(lexer);
+}
+
 std::unique_ptr<ast::Expression> parse_increment_expression(Lexer& lexer)
 {
     auto curr = lexer.peek_current();
@@ -56,7 +101,7 @@ std::unique_ptr<ast::Expression> parse_increment_expression(Lexer& lexer)
         return std::make_unique<ast::PostIncrement>(std::move(curr.lexema), value);
     }
 
-    return parse_primary_expression(lexer);
+    return parse_function_call_expression(lexer);
 }
 
 std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer, std::unique_ptr<ast::Expression> lhs)
@@ -83,6 +128,7 @@ std::unique_ptr<ast::Expression> parse_multiplicative_expression_r(Lexer& lexer,
 
     if (curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == ','
         || curr.tk_type == '?'
         || curr.tk_type == ':'
         || curr.tk_type == TokenType::LOGICAL_OR
@@ -132,6 +178,7 @@ std::unique_ptr<ast::Expression> parse_additive_expression_r(Lexer& lexer, std::
     if (auto curr = lexer.peek_current();
         curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == ','
         || curr.tk_type == '?'
         || curr.tk_type == ':'
         || curr.tk_type == TokenType::LOGICAL_OR
@@ -215,6 +262,7 @@ std::unique_ptr<ast::Expression> parse_equality_expression_r(Lexer& lexer, std::
     if (auto curr = lexer.peek_current();
         curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == ','
         || curr.tk_type == '?'
         || curr.tk_type == ':'
         || curr.tk_type == TokenType::LOGICAL_OR
@@ -256,6 +304,7 @@ std::unique_ptr<ast::Expression> parse_logical_and_expression_r(Lexer& lexer, st
     if (auto curr = lexer.peek_current();
         curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == ','
         || curr.tk_type == '?'
         || curr.tk_type == ':'
         || curr.tk_type == TokenType::LOGICAL_OR)
@@ -294,6 +343,7 @@ std::unique_ptr<ast::Expression> parse_logical_or_expression_r(Lexer& lexer, std
     if (auto curr = lexer.peek_current();
         curr.tk_type == ';'
         || curr.tk_type == ')'
+        || curr.tk_type == ','
         || curr.tk_type == '?'
         || curr.tk_type == ':')
     {
@@ -331,7 +381,7 @@ std::unique_ptr<ast::Expression> parse_conditional_expression(Lexer& lexer)
         return std::make_unique<ast::ConditionalExpression>(std::move(condition), std::move(true_branch), std::move(false_branch));
     }
 
-    if (curr.tk_type == ';' || curr.tk_type == ')' || curr.tk_type == '?' || curr.tk_type == ':')
+    if (curr.tk_type == ';' || curr.tk_type == ')' || curr.tk_type == ',' || curr.tk_type == '?' || curr.tk_type == ':')
     {
         return condition;
     }

@@ -33,7 +33,7 @@ namespace ast
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
             if (_initializer)
-                _initializer->set_variable_scope(var_scope, _ftable);
+                _initializer->set_variable_scope(var_scope, ftable);
 
             _var_scope = std::move(var_scope);
             _ftable = std::move(ftable);
@@ -56,7 +56,7 @@ namespace ast
         {
             for (auto& decl: _decls)
             {
-                decl->set_variable_scope(var_scope, _ftable);
+                decl->set_variable_scope(var_scope, ftable);
             }
 
             _var_scope = std::move(var_scope);
@@ -79,7 +79,7 @@ namespace ast
 
         void set_variable_scope(std::shared_ptr<VariableScope> var_scope, std::shared_ptr<FunctionTable> ftable) override
         {
-            _expr->set_variable_scope(var_scope, _ftable);
+            _expr->set_variable_scope(var_scope, ftable);
             _var_scope = std::move(var_scope);
             _ftable = std::move(ftable);
         }

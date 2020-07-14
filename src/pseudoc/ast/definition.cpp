@@ -71,6 +71,8 @@ std::unique_ptr<irl::IrlSegment> FunctionDefinition::code_gen(irl::Context conte
         def.params.push_back(p->get_type());
     }
 
+    _ftable->add_function(_identifier, def);
+
     segment->instructions.push_back(std::make_unique<irl::Def>(_identifier, def));
 
     _var_scope->skip();

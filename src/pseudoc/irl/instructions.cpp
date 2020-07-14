@@ -327,3 +327,31 @@ std::string ZExt::print()
         + _in->print() + " to "
         + atomic_to_string(_out->tp) + "\n";
 }
+
+Call::Call(std::string id, std::shared_ptr<Variable> out, LlvmAtomic tp):
+    _id(id),
+    _out(std::move(out))
+{
+    _tp = tp;
+}
+
+void Call::add_param(std::shared_ptr<Value> param)
+{
+    _params.push_back(std::move(param));
+}
+
+std::string Call::print()
+{
+    // %5 = call i32 @func(i32 1, i32 %4, i32 3)
+    std::string l = _tp == LlvmAtomic::v ? "  " : "  " + _out->print() + " = ";
+    l += "call " + atomic_to_string(_tp) + " @" + _id + "(";
+    std::string junc = "";
+
+    for (auto& param: _params)
+    {
+        l += junc + atomic_to_string(param->tp) + " " + param->print();
+        junc = ", ";
+    }
+
+    return l + ")\n";
+}

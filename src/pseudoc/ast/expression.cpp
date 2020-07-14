@@ -593,3 +593,72 @@ std::unique_ptr<irl::IrlSegment> ConditionalExpression::code_gen(irl::Context co
 
     return segment;
 }
+
+FCall::FCall(std::string id, std::vector<std::unique_ptr<Expression>> params):
+    _id(id),
+    _params(std::move(params))
+{
+    _tp = irl::LlvmAtomic::i32;
+}
+
+std::string FCall::print()
+{
+    std::string f = "call " + _id + "( ";
+    std::string junc = "";
+
+    for (auto& param: _params)
+    {
+        f += junc + param->print();
+        junc = ", ";
+    }
+
+    return f + ")";
+}
+
+std::unique_ptr<irl::IrlSegment> FCall::code_gen(irl::Context context)
+{
+    auto segment = std::make_unique<irl::IrlSegment>();
+
+    auto func = _ftable->get_function(_id);
+    auto out = _var_scope->new_temp(func.tp);
+
+    if (_params.size() < func.params.size())
+        throw std::logic_error("too many params for function " + _id);
+
+    if (_params.size() > func.params.size())
+        throw std::logic_error("function " + _id + " called with too many params");
+
+    std::vector<std::shared_ptr<irl::Value>> ps;
+
+    for (int i = 0; i < func.params.size(); i++)
+    {
+        auto pseg = _params[i]->code_gen(context);
+
+        for (auto& i: pseg->instructions)
+        {
+            segment->instructions.push_back(std::move(i));
+        }
+
+        if (pseg->out_value->tp != func.params[i])
+            throw std::logic_error("type mismatch on param " + std::to_string(i));
+
+        ps.push_back(pseg->out_value);
+    }
+
+    auto fcal = std::make_unique<irl::Call>(_id, out, func.tp);
+
+    for (auto& p: ps)
+    {
+        fcal->add_param(std::move(p));
+    }
+
+    segment->instructions.push_back(std::move(fcal));
+    segment->out_value = std::move(out);
+
+    return segment;
+}
+
+// void FCall::add_param(std::unique_ptr<Expression> param)
+// {
+//     _params.push_back(std::move(param));
+// }
